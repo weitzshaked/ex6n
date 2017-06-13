@@ -44,7 +44,7 @@ public class VariableFactory {
                             return new Variables<Character>(type, val.charAt(0), matcher.group("name"), isFinal);
                         }
                     default:
-                        throw new LogicalException("1");
+                        throw new LogicalException();
                 }
             } else {
 //                val = matcher.group("value");
@@ -73,12 +73,12 @@ public class VariableFactory {
                         return new Variables<Character>(type, null, matcher.group("name"), isFinal);
 //                        }
                     default:
-                        throw new LogicalException("1");
+                        throw new LogicalException();
                 }
             }
         } else {
             //todo
-            throw new SyntaxException("1");
+            throw new SyntaxException();
         }
     }
 }

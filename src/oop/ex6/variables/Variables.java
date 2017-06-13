@@ -15,6 +15,4 @@ public class Variables<T> {
         this.type = type;
         this.isFinal = isFinal;
     }
-
-
 }
