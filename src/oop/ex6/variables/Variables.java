@@ -17,51 +17,58 @@ public class Variables {
     private boolean isFinal = false;
     private CodeBlock codeBlock;
 
-    private enum Types{
-        INT("int","-?\\d+"),
-        STRING("String",".*"),
-        DOUBLE("double","\\d+/.\\d+"),
-        BOOLEAN("boolean","true | false"),
-        CHAR("char",". | \\w | \\s");
+    private enum Types {
+        INT("int", "-?\\d+"),
+        STRING("String", ".*"),
+        DOUBLE("double", "\\d+/.\\d+"),
+        BOOLEAN("boolean", "true | false"),
+        CHAR("char", ". | \\w | \\s");
 
         private final String pattern, name;
 
-        Types(String typeName, String typePattern){
+        Types(String typeName, String typePattern) {
             pattern = typePattern;
             name = typeName;
         }
     }
 
-    public Variables(CodeBlock codeBlock, String type, String data, String name, boolean isFinal) throws Exception{
+    public Variables(CodeBlock codeBlock, String type, String data, String name, boolean isFinal) throws Exception {
         this.codeBlock = codeBlock;
-        //todo final
-        if(data != null) {
-            for (Types types: Types.values()) {
-                if(types.name.equals(type)){
-                    Pattern pattern = Pattern.compile(types.pattern);
-                    Matcher matcher = pattern.matcher(data);
-                    if(matcher.matches()){
-                        this.hasData = true;
-                        break;
-                    }
-                    //todo if a = b
-                    else {
-                        Variables variable = codeBlock.hasVariable(data);
-                        if(variable!= null){
-                            if(variable.getType().equals(type)){
-                                hasData = true;
-                            }
-                        }
-                        else {
-                            throw new LogicalException();
-                        }
-                    }
-                }
-            }
+        if (data != null) {
+            updateData(data);
         }
         this.name = name;
         this.type = type;
         this.isFinal = isFinal;
+    }
+
+
+    public void updateData(String data) throws LogicalException {
+        if (isFinal) {
+            throw new LogicalException();
+        } else {
+            for (Types types : Types.values()) {
+                if (types.name.equals(type)) {
+                    Pattern pattern = Pattern.compile(types.pattern);
+                    Matcher matcher = pattern.matcher(data);
+                    if (matcher.matches()) {
+                        this.hasData = true;
+                        break;
+                    }
+                    else {
+                        Variables variable = codeBlock.hasVariable(data);
+                        if (variable != null) {
+                            if (variable.getType().equals(type)) {
+                                hasData = true;
+                            }
+                        } else {
+                            throw new LogicalException();
+                        }
+                    }
+                }
+
+            }
+        }
     }
 
     public String getName() {
