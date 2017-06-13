@@ -32,7 +32,7 @@ public class CodeBlock {
     public static final String OPENMETHOD = ".*?\\{\\s*";
     public static final String CLOSEDMETHOD = "\\s*\\}\\s*";
 
-    public CodeBlock(CodeBlock parent, String[] codeLines) {
+    public CodeBlock(CodeBlock parent, String[] codeLines) throws SyntaxException {
         this.parent = parent;
         this.codeLines = codeLines;
         this.inerVariables = new ArrayList<>();
@@ -40,7 +40,7 @@ public class CodeBlock {
         linesToBlocks();
     }
 
-    protected void linesToBlocks() {
+    protected void linesToBlocks() throws SyntaxException{
         int i = 0;
         while (i < codeLines.length) {
             if (checkOneLiner(codeLines[i], IGNOREPATTERN)) {
@@ -51,7 +51,7 @@ public class CodeBlock {
             } else {
                 if (checkOneLiner(codeLines[i], OPENMETHOD)) {
                     try {
-                        int firstline = i;
+                        int firstLine = i;
                         int openCounter = 1, closedCounter = 0;
                         i++;
                         while (openCounter != closedCounter && i < codeLines.length) {
@@ -62,9 +62,10 @@ public class CodeBlock {
                             }
                             i++;
                         }
-                        String[] methodLines = Arrays.copyOfRange(codeLines, firstline, i - 1);
-                        inerBlocks.add(BlockFactory.blockFactory(this, codeLines[firstline], methodLines));
+                        String[] methodLines = Arrays.copyOfRange(codeLines, firstLine, i - 1);
+                        inerBlocks.add(BlockFactory.blockFactory(this, codeLines[firstLine], methodLines));
                     } catch (SyntaxException e) {
+                        throw e;
                     }
                 }
 

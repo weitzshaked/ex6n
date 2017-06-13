@@ -81,5 +81,4 @@ public class VariableFactory {
             throw new SyntaxException("1");
         }
     }
-
 }

@@ -25,7 +25,8 @@ public class BlockFactory {
             }
         }
         else {
-            throw new SyntaxException("No such Block Type");
+            throw new SyntaxException();
+            //"No such Block Type"
         }
     }
 
