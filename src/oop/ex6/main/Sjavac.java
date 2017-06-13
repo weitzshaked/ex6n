@@ -13,7 +13,7 @@ import java.util.List;
  * Sjavac
  */
 public class Sjavac {
-    private Sjavac(String path) throws IOException,SyntaxException {
+    private Sjavac(String path) throws Exception {
         try {
             File javaFile = new File(path);
             List<String> allLines = Files.readAllLines(javaFile.toPath());
@@ -36,6 +36,8 @@ public class Sjavac {
             System.out.println(2);
             System.out.println(e.getMessage());
         }catch (SyntaxException e) {
+            //TODO something
+        }catch (Exception e) {
             //TODO something
         }
         System.out.println(0);

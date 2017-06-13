@@ -11,7 +11,7 @@ public class Method extends CodeBlock {
     private String name;
     private Variables[] parameters;
 
-    public Method(CodeBlock parent, String[] codeLines, String name, String parameters) throws SyntaxException{
+    public Method(CodeBlock parent, String[] codeLines, String name, String parameters) throws Exception{
         super(parent, codeLines);
         //todo split parameters, create
         this.name = name;

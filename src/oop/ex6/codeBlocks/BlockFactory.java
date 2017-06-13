@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 public class BlockFactory {
 
     //todo switch case method, condition
-    public static CodeBlock blockFactory(CodeBlock parent, String line, String[] innerLines) throws SyntaxException {
+    public static CodeBlock blockFactory(CodeBlock parent, String line, String[] innerLines) throws Exception {
         Pattern pattern = Pattern.compile("/s*(/w+)/s*(\\(/w.*?\\))/s*\\{/s*");
         Matcher matcher = pattern.matcher(line);
         if(matcher.matches()) {

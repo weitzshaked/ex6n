@@ -13,7 +13,7 @@ public class ConditionBlock extends CodeBlock {
     public enum Type {If, While}
 
 
-    public ConditionBlock(CodeBlock parent, String[] codeLines, String condition, Type type) throws SyntaxException {
+    public ConditionBlock(CodeBlock parent, String[] codeLines, String condition, Type type) throws Exception {
         super(parent, codeLines);
         //todo check condition pattern
         this.condition = condition;
