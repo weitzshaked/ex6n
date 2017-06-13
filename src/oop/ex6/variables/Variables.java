@@ -1,5 +1,6 @@
 package oop.ex6.variables;
 
+import oop.ex6.Exceptions.LogicalException;
 import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.codeBlocks.CodeBlock;
 
@@ -29,12 +30,11 @@ public class Variables {
             pattern = typePattern;
             name = typeName;
         }
-
     }
 
-    public Variables(CodeBlock codeBlock, String type, String data, String name, boolean isFinal) throws SyntaxException{
+    public Variables(CodeBlock codeBlock, String type, String data, String name, boolean isFinal) throws Exception{
         this.codeBlock = codeBlock;
-        //todo int a = b
+        //todo final
         if(data != null) {
             for (Types types: Types.values()) {
                 if(types.name.equals(type)){
@@ -44,8 +44,17 @@ public class Variables {
                         this.hasData = true;
                         break;
                     }
+                    //todo if a = b
                     else {
-                        throw new SyntaxException();
+                        Variables variable = codeBlock.hasVariable(data);
+                        if(variable!= null){
+                            if(variable.getType().equals(type)){
+                                hasData = true;
+                            }
+                        }
+                        else {
+                            throw new LogicalException();
+                        }
                     }
                 }
             }
@@ -57,5 +66,9 @@ public class Variables {
 
     public String getName() {
         return name;
+    }
+
+    public String getType() {
+        return type;
     }
 }

@@ -68,17 +68,20 @@ public abstract class CodeBlock {
     public List<Variables> getInnerVariables() {
         return innerVariables;
     }
-    public Variables hasVariable(String name)throws LogicalException{
+
+    public Variables hasVariable(String name){
         CodeBlock codeBlock = this;
         while (codeBlock.getParent()!= null) {
             for (Variables variable : codeBlock.getInnerVariables()) {
-                if (variable.getName().matches(matcher.group("name"))) {
+                if (variable.getName().equals(name)) {
                     return variable;
                 }
             }
             codeBlock = codeBlock.getParent();
-        } return null;
+        }
+        return null;
     }
+
     /**
      * @param line         to check
      * @param checkPattern to match

@@ -21,6 +21,9 @@ public class VariableFactory {
             }
         }
         //checks if name exists
+        if(codeBlock.hasVariable(matcher.group("name"))!= null){
+            throw new LogicalException();
+        }
         switch (type) {
             case "int":
                 return new Variables(codeBlock, type, val, matcher.group("name").trim(), isFinal);
