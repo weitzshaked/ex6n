@@ -2,8 +2,6 @@ package oop.ex6.variables;
 
 import oop.ex6.Exceptions.SyntaxException;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,7 +10,7 @@ import java.util.regex.Pattern;
  */
 public class Variables {
 
-    private boolean hasData=false;
+    private boolean hasData = false;
     private String name, type;
     private boolean isFinal = false;
 
@@ -53,5 +51,4 @@ public class Variables {
         this.type = type;
         this.isFinal = isFinal;
     }
-
 }

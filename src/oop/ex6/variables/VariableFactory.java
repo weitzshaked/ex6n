@@ -1,6 +1,5 @@
 package oop.ex6.variables;
 
-import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.Exceptions.LogicalException;
 
 import java.util.regex.Matcher;
@@ -14,13 +13,13 @@ public class VariableFactory {
     public static Variables variableFactory(String type, boolean isFinal, String nameAndVal) throws Exception {
         Pattern pattern = Pattern.compile("(?<name>\\s*\\w+)((?<equal>\\s*=\\s*)(?<value>.+\\w+.*))?");
         Matcher matcher = pattern.matcher(nameAndVal);
-        Matcher digits;
         String val = null;
         if (matcher.matches()) {
             if (matcher.group("value") != null) {
                 val = matcher.group("value");
             }
         }
+        //todo check if name exists
         switch (type) {
             case "int":
                 return new Variables(type, val, matcher.group("name").trim(), isFinal);
