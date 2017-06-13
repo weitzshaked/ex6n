@@ -34,7 +34,7 @@ public abstract class CodeBlock {
     public static final String CLOSE_BLOCK_PATTERN = "\\s*\\}\\s*";
     public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D\\w*)\\s*\\((?<param>\\D\\w*,)*\\s*(?<lastParam>\\D\\w*)\\s*;";
 
-    public CodeBlock(CodeBlock parent, String[] codeLines) throws SyntaxException {
+    public CodeBlock(CodeBlock parent, String[] codeLines) throws Exception {
         this.parent = parent;
         this.codeLines = codeLines;
         this.innerVariables = new ArrayList<>();
@@ -42,7 +42,15 @@ public abstract class CodeBlock {
         linesToBlocks();
     }
 
-    protected void linesToBlocks() throws SyntaxException {
+    public List<Variables> getInnerVariables() {
+        return innerVariables;
+    }
+
+    public CodeBlock getParent() {
+        return parent;
+    }
+
+    protected void linesToBlocks() throws Exception {
         int i = 0;
         while (i < codeLines.length) {
             if (checkOneLiner(codeLines[i], IGNORE_LINE_PATTERN)) {
@@ -52,23 +60,19 @@ public abstract class CodeBlock {
                 i++;
             } else {
                 if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
-                    try {
-                        int firstLine = i;
-                        int openCounter = 1, closedCounter = 0;
-                        i++;
-                        while (openCounter != closedCounter && i < codeLines.length) {
-                            if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
-                                openCounter++;
-                            } else if (checkOneLiner(codeLines[i], CLOSE_BLOCK_PATTERN)) {
-                                closedCounter++;
-                            }
-                            i++;
+                    int firstLine = i;
+                    int openCounter = 1, closedCounter = 0;
+                    i++;
+                    while (openCounter != closedCounter && i < codeLines.length) {
+                        if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
+                            openCounter++;
+                        } else if (checkOneLiner(codeLines[i], CLOSE_BLOCK_PATTERN)) {
+                            closedCounter++;
                         }
-                        String[] methodLines = Arrays.copyOfRange(codeLines, firstLine, i - 1);
-                        innerBlocks.add(BlockFactory.blockFactory(this, codeLines[firstLine], methodLines));
-                    } catch (SyntaxException e) {
-                        throw e;
+                        i++;
                     }
+                    String[] methodLines = Arrays.copyOfRange(codeLines, firstLine, i - 1);
+                    innerBlocks.add(BlockFactory.blockFactory(this, codeLines[firstLine], methodLines));
                 }
 
             }
@@ -102,16 +106,11 @@ public abstract class CodeBlock {
         try {
             while (matcher.find()) {
                 for (int i = 0; i < matcher.groupCount(); i++) {
-                    innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group(i)));
+                    innerVariables.add(VariableFactory.variableFactory(this, type, isFinal, matcher.group(i)));
                 }
             }
-//            while (matcher.group("val1") != null) {
-//                innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("val1")));
-//            }
-//            innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("mainval")));
         } catch (Exception e) {
             System.out.println("bad");
         }
     }
 }
-
