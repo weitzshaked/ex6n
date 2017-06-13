@@ -51,6 +51,7 @@ public class VariableFactory {
             }
         }
         else {
+            //todo
             throw new SyntaxException("1");
         }
     }
