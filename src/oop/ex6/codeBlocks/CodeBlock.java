@@ -13,57 +13,59 @@ import java.util.regex.Pattern;
 /**
  * CodeBlocks abstract Class
  */
-public class CodeBlock {
+public abstract class CodeBlock {
 
-    protected List<CodeBlock> inerBlocks;
-    protected List<Variables> inerVariables;
+    protected List<CodeBlock> innerBlocks;
+    protected List<Variables> innerVariables;
 
     protected CodeBlock parent;
     protected String[] codeLines;
 
     private Matcher matcher;
+
     private Pattern pattern;
 
-    public static final String IGNOREPATTERN = "^///.+|\\s+";
+    public static final String IGNORE_LINE_PATTERN = "^///.+|\\s+";
     //public static final String SEMICOLOMPATTERN = ".*?;/s*";
-    public static final String VARIABLEPATTERN = "(?<final>\\s*final\\s+)?(?<type>\\w*\\s+)(?<val1>\\D\\w*(\\s*=\\s*\\.+)?(\\s*,))*" +
-            "(?<mainval>\\s*\\D\\w*(\\s*=\\s*.+)?\\s*)(?<ending>;\\s*)";
-    public static final String SINGLEVARIABLE = "(\\w*\\s+)(\\D\\w*(\\s*=\\s*\\w+)?)";
-    public static final String OPENMETHOD = ".*?\\{\\s*";
-    public static final String CLOSEDMETHOD = "\\s*\\}\\s*";
+    public static final String VARIABLE_PATTERN = "(?<final>\\s*final\\s+)?(?<type>\\w*\\s+)(?<nameAndValues>(\\D\\w*(\\s*=\\s*\\.+)?(\\s*,))*" +
+            "(\\s*\\D\\w*(\\s*=\\s*.+)?\\s*))(?<ending>;\\s*)";
+    //public static final String SINGLE_VARIABLE_PATTERN = "(\\w*\\s+)(\\D\\w*(\\s*=\\s*\\w+)?)";
+    public static final String OPEN_BLOCK_PATTERN = ".*?\\{\\s*";
+    public static final String CLOSE_BLOCK_PATTERN = "\\s*\\}\\s*";
+    public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D\\w*)\\s*\\((?<param>\\D\\w*,)*\\s*(?<lastParam>\\D\\w*)\\s*;";
 
     public CodeBlock(CodeBlock parent, String[] codeLines) throws SyntaxException {
         this.parent = parent;
         this.codeLines = codeLines;
-        this.inerVariables = new ArrayList<>();
-        this.inerBlocks = new ArrayList<>();
+        this.innerVariables = new ArrayList<>();
+        this.innerBlocks = new ArrayList<>();
         linesToBlocks();
     }
 
-    protected void linesToBlocks() throws SyntaxException{
+    protected void linesToBlocks() throws SyntaxException {
         int i = 0;
         while (i < codeLines.length) {
-            if (checkOneLiner(codeLines[i], IGNOREPATTERN)) {
+            if (checkOneLiner(codeLines[i], IGNORE_LINE_PATTERN)) {
                 i++;
-            } else if (checkOneLiner(codeLines[i], VARIABLEPATTERN)) {
+            } else if (checkOneLiner(codeLines[i], VARIABLE_PATTERN)) {
                 parseVariableLine(codeLines[i]);
                 i++;
             } else {
-                if (checkOneLiner(codeLines[i], OPENMETHOD)) {
+                if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
                     try {
                         int firstLine = i;
                         int openCounter = 1, closedCounter = 0;
                         i++;
                         while (openCounter != closedCounter && i < codeLines.length) {
-                            if (checkOneLiner(codeLines[i], OPENMETHOD)) {
+                            if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
                                 openCounter++;
-                            } else if (checkOneLiner(codeLines[i], CLOSEDMETHOD)) {
+                            } else if (checkOneLiner(codeLines[i], CLOSE_BLOCK_PATTERN)) {
                                 closedCounter++;
                             }
                             i++;
                         }
                         String[] methodLines = Arrays.copyOfRange(codeLines, firstLine, i - 1);
-                        inerBlocks.add(BlockFactory.blockFactory(this, codeLines[firstLine], methodLines));
+                        innerBlocks.add(BlockFactory.blockFactory(this, codeLines[firstLine], methodLines));
                     } catch (SyntaxException e) {
                         throw e;
                     }
@@ -85,10 +87,9 @@ public class CodeBlock {
     }
 
 
-    private boolean checkMethod(String line) {
-        //todo
-        return true;
-    }
+//    private boolean checkMethod(String line) {
+//        return true;
+//    }
 
     private void parseVariableLine(String line) {
         boolean isFinal = false;
@@ -96,12 +97,18 @@ public class CodeBlock {
             isFinal = true;
         }
         String type = matcher.group("type").trim();
+        String nameAndValues = matcher.group("nameAndValues").trim();
+        pattern = Pattern.compile("^(?:(\\D\\w*=\\w+);)*$", Pattern.MULTILINE);
         try {
-            //todo run on all val1
-            while (matcher.group("val1") != null) {
-                inerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("val1")));
+            while (matcher.find()) {
+                for (int i = 0; i < matcher.groupCount(); i++) {
+                    innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group(i)));
+                }
             }
-            inerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("mainval")));
+//            while (matcher.group("val1") != null) {
+//                innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("val1")));
+//            }
+//            innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("mainval")));
         } catch (Exception e) {
             System.out.println("bad");
         }
