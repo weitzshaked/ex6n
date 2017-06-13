@@ -47,10 +47,36 @@ public class VariableFactory {
                         throw new LogicalException("1");
                 }
             } else {
-                throw new SyntaxException("1");
+//                val = matcher.group("value");
+                switch (type) {
+                    case "int":
+//                        pattern = pattern.compile("-?\\d+");
+//                        digits = pattern.matcher(val);
+//                        if (digits.matches()) {
+                        return new Variables<Integer>(type, null,
+                                matcher.group("name").trim(), isFinal);
+//                        }
+                    case "String":
+                        return new Variables<String>(type, null, matcher.group("name"), isFinal);
+                    case "double":
+//                        pattern = pattern.compile("\\d+/.\\d+");
+//                        digits = pattern.matcher(val);
+//                        if (digits.matches()) {
+                        return new Variables<Double>(type, null, matcher.group("name"), isFinal);
+//                        }
+                    case "boolean":
+//                        if (val.equals("true") || val.equals("false")) {
+                        return new Variables<Boolean>(type, null, matcher.group("name"), isFinal);
+//                        }
+                    case "char":
+//                        if (val.length() == 1) {
+                        return new Variables<Character>(type, null, matcher.group("name"), isFinal);
+//                        }
+                    default:
+                        throw new LogicalException("1");
+                }
             }
-        }
-        else {
+        } else {
             //todo
             throw new SyntaxException("1");
         }

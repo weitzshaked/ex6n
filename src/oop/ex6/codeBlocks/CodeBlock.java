@@ -1,5 +1,6 @@
 package oop.ex6.codeBlocks;
 
+import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.variables.VariableFactory;
 import oop.ex6.variables.Variables;
 
@@ -45,7 +46,7 @@ public class CodeBlock {
             if (checkOneLiner(codeLines[i], IGNOREPATTERN)) {
                 i++;
             } else if (checkOneLiner(codeLines[i], VARIABLEPATTERN)) {
-                parseVariableLine();
+                parseVariableLine(codeLines[i]);
                 i++;
             } else {
                 if (checkOneLiner(codeLines[i], OPENMETHOD)) {
@@ -63,9 +64,7 @@ public class CodeBlock {
                         }
                         String[] methodLines = Arrays.copyOfRange(codeLines, firstline, i - 1);
                         inerBlocks.add(BlockFactory.blockFactory(this, codeLines[firstline], methodLines));
-                    }
-                    catch (Exception e){
-
+                    } catch (SyntaxException e) {
                     }
                 }
 
@@ -90,19 +89,19 @@ public class CodeBlock {
         return true;
     }
 
-    private void parseVariableLine() {
+    private void parseVariableLine(String line) {
         boolean isFinal = false;
-        if (matcher.group("final")!= null) {
+        if (matcher.group("final") != null) {
             isFinal = true;
         }
         String type = matcher.group("type").trim();
         try {
             //todo run on all val1
-            while (matcher.group("val1")!=null) {
+            while (matcher.group("val1") != null) {
                 inerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("val1")));
             }
             inerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("mainval")));
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("bad");
         }
     }

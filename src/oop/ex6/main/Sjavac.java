@@ -10,24 +10,27 @@ import java.util.List;
 /**
  * Sjavac
  */
-public class Sjavac
-{
-    public Sjavac(String path){
+public class Sjavac {
+    private Sjavac(String path) throws IOException {
         try {
             File javaFile = new File(path);
             List<String> allLines = Files.readAllLines(javaFile.toPath());
             String[] lines = new String[allLines.size()];
             lines = allLines.toArray(lines);
             CodeBlock mainBlock = new CodeBlock(null, lines);
-        }
-        catch (IOException e){
-            System.out.println(2);
+        } catch (IOException e) {
+            throw new IOException("ERROR: code file invalid or missing");
         }
     }
 
 
     public static void main(String[] args) {
-        Sjavac sjavac = new Sjavac(args[0]);
+        try {
+            Sjavac sjavac = new Sjavac(args[0]);
+        } catch (IOException e) {
+            System.out.println(2);
+            System.out.println(e.getMessage());
+        }
         System.out.println(0);
     }
 }
