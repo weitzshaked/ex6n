@@ -20,7 +20,16 @@ public class VariableFactory {
                 val = matcher.group("value");
             }
         }
-        //todo check if name exists
+        //checks if name exists
+        while (codeBlock.getParent()!= null) {
+            for (Variables variable : codeBlock.getInnerVariables()) {
+                if (variable.getName().matches(matcher.group("name"))) {
+                    throw new LogicalException();
+                }
+            }
+            codeBlock = codeBlock.getParent();
+        }
+
         switch (type) {
             case "int":
                 return new Variables(codeBlock, type, val, matcher.group("name").trim(), isFinal);

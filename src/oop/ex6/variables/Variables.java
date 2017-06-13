@@ -32,9 +32,9 @@ public class Variables {
 
     }
 
-
     public Variables(CodeBlock codeBlock, String type, String data, String name, boolean isFinal) throws SyntaxException{
         this.codeBlock = codeBlock;
+        //todo int a = b
         if(data != null) {
             for (Types types: Types.values()) {
                 if(types.name.equals(type)){
@@ -53,5 +53,9 @@ public class Variables {
         this.name = name;
         this.type = type;
         this.isFinal = isFinal;
+    }
+
+    public String getName() {
+        return name;
     }
 }
