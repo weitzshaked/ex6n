@@ -102,7 +102,7 @@ public abstract class CodeBlock {
         try {
             while (matcher.find()) {
                 for (int i = 0; i < matcher.groupCount(); i++) {
-                    innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group(i)));
+                    innerVariables.add(VariableFactory.variableFactory(this, type, isFinal, matcher.group(i)));
                 }
             }
 //            while (matcher.group("val1") != null) {
@@ -112,6 +112,14 @@ public abstract class CodeBlock {
         } catch (Exception e) {
             System.out.println("bad");
         }
+    }
+
+    public CodeBlock getParent() {
+        return parent;
+    }
+
+    public List<Variables> getInnerVariables() {
+        return innerVariables;
     }
 }
 

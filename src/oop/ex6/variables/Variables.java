@@ -1,6 +1,7 @@
 package oop.ex6.variables;
 
 import oop.ex6.Exceptions.SyntaxException;
+import oop.ex6.codeBlocks.CodeBlock;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,10 +14,11 @@ public class Variables {
     private boolean hasData = false;
     private String name, type;
     private boolean isFinal = false;
+    private CodeBlock codeBlock;
 
     private enum Types{
         INT("int","-?\\d+"),
-        STRING("String",""),
+        STRING("String",".*"),
         DOUBLE("double","\\d+/.\\d+"),
         BOOLEAN("boolean","true | false"),
         CHAR("char",". | \\w | \\s");
@@ -31,7 +33,8 @@ public class Variables {
     }
 
 
-    public Variables(String type, String data, String name, boolean isFinal) throws SyntaxException{
+    public Variables(CodeBlock codeBlock, String type, String data, String name, boolean isFinal) throws SyntaxException{
+        this.codeBlock = codeBlock;
         if(data != null) {
             for (Types types: Types.values()) {
                 if(types.name.equals(type)){
