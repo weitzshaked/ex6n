@@ -34,7 +34,7 @@ public abstract class CodeBlock {
     public static final String CLOSE_BLOCK_PATTERN = "\\s*\\}\\s*";
     public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D\\w*)\\s*\\((?<param>\\D\\w*,)*\\s*(?<lastParam>\\D\\w*)\\s*;";
 
-    public CodeBlock(CodeBlock parent, String[] codeLines) throws Exception {
+    public CodeBlock(CodeBlock parent, String[] codeLines) throws SyntaxException {
         this.parent = parent;
         this.codeLines = codeLines;
         this.innerVariables = new ArrayList<>();
@@ -42,21 +42,36 @@ public abstract class CodeBlock {
         linesToBlocks();
     }
 
-    protected void linesToBlocks() throws Exception {
+    protected void linesToBlocks() throws SyntaxException {
         int i = 0;
         while (i < codeLines.length) {
-            //if line should be ignored (empty or comment);
             if (checkOneLiner(codeLines[i], IGNORE_LINE_PATTERN)) {
                 i++;
-            } //line is a variable declaration;
-            else if (checkOneLiner(codeLines[i], VARIABLE_PATTERN)) {
+            } else if (checkOneLiner(codeLines[i], VARIABLE_PATTERN)) {
                 parseVariableLine(codeLines[i]);
                 i++;
-            } //line is a code block;
-            else if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
-                parseBlock(i);
-            }// TODO handle the situation when line is a method decleration
+            } else {
+                if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
+                    try {
+                        int firstLine = i;
+                        int openCounter = 1, closedCounter = 0;
+                        i++;
+                        while (openCounter != closedCounter && i < codeLines.length) {
+                            if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
+                                openCounter++;
+                            } else if (checkOneLiner(codeLines[i], CLOSE_BLOCK_PATTERN)) {
+                                closedCounter++;
+                            }
+                            i++;
+                        }
+                        String[] methodLines = Arrays.copyOfRange(codeLines, firstLine, i - 1);
+                        innerBlocks.add(BlockFactory.blockFactory(this, codeLines[firstLine], methodLines));
+                    } catch (SyntaxException e) {
+                        throw e;
+                    }
+                }
 
+            }
         }
     }
 
@@ -72,53 +87,31 @@ public abstract class CodeBlock {
     }
 
 
-    //    private boolean checkMethod(String line) {
+//    private boolean checkMethod(String line) {
 //        return true;
 //    }
-    private void parseBlock(int i) throws Exception {
-        try {
-            int firstLine = i;
-            int openCounter = 1, closedCounter = 0;
-            i++;
-            while (openCounter != closedCounter && i < codeLines.length) {
-                if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
-                    openCounter++;
-                } else if (checkOneLiner(codeLines[i], CLOSE_BLOCK_PATTERN)) {
-                    closedCounter++;
-                }
-                i++;
-            }
-            String[] methodLines = Arrays.copyOfRange(codeLines, firstLine, i - 1);
-            innerBlocks.add(BlockFactory.blockFactory(this, codeLines[firstLine], methodLines));
-        } catch (Exception e) {
-            throw e;
-        }
-    }
 
-    private void parseVariableLine(String line) throws Exception {
+    private void parseVariableLine(String line) {
         boolean isFinal = false;
-        int numOfVariables = matcher.groupCount() - 1;
         if (matcher.group("final") != null) {
             isFinal = true;
-            numOfVariables--;
         }
         String type = matcher.group("type").trim();
-        String namesAndValues = matcher.group("nameAndValues").trim();
-        String[] nameAndValuesArray = namesAndValues.split(",");
-        for (String str : nameAndValuesArray) {
-            innerVariables.add(VariableFactory.variableFactory(type, isFinal, str));
-        }
-//        try {
-//            for (int i = 0; i < numOfVariables; i++) {
-//                innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group(i)));
-//            }
+        String nameAndValues = matcher.group("nameAndValues").trim();
+        pattern = Pattern.compile("^(?:(\\D\\w*=\\w+);)*$", Pattern.MULTILINE);
+        try {
+            while (matcher.find()) {
+                for (int i = 0; i < matcher.groupCount(); i++) {
+                    innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group(i)));
+                }
+            }
 //            while (matcher.group("val1") != null) {
 //                innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("val1")));
 //            }
 //            innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("mainval")));
-//        } catch (Exception e) {
-//            System.out.println("bad");
-//        }
+        } catch (Exception e) {
+            System.out.println("bad");
+        }
     }
 }
 
