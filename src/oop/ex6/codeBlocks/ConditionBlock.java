@@ -1,6 +1,5 @@
 package oop.ex6.codeBlocks;
 
-import oop.ex6.Exceptions.SyntaxException;
 
 /**
  * Condition Block Class
