@@ -95,7 +95,7 @@ public class CodeBlock {
         if (matcher.group("final")!= null) {
             isFinal = true;
         }
-        String type = matcher.group("type");
+        String type = matcher.group("type").trim();
         try {
             //todo run on all val1
             while (matcher.group("val1")!=null) {
@@ -103,7 +103,7 @@ public class CodeBlock {
             }
             inerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("mainval")));
         }catch (Exception e){
-
+            System.out.println("bad");
         }
     }
 }
