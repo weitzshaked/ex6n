@@ -116,10 +116,8 @@ public abstract class CodeBlock {
 
     private void parseVariableLine(String line) throws Exception {
         boolean isFinal = false;
-        int numOfVariables = matcher.groupCount() - 1;
         if (matcher.group("final") != null) {
             isFinal = true;
-            numOfVariables--;
         }
         String type = matcher.group("type").trim();
         String namesAndValues = matcher.group("nameAndValues").trim();
