@@ -1,5 +1,6 @@
 package oop.ex6.codeBlocks;
 
+import oop.ex6.Exceptions.LogicalException;
 import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.variables.VariableFactory;
 import oop.ex6.variables.Variables;
@@ -42,43 +43,42 @@ public abstract class CodeBlock {
         linesToBlocks();
     }
 
-    public List<Variables> getInnerVariables() {
-        return innerVariables;
+    protected void linesToBlocks() throws Exception {
+        int i = 0;
+        while (i < codeLines.length) {
+            //if line should be ignored (empty or comment);
+            if (checkOneLiner(codeLines[i], IGNORE_LINE_PATTERN)) {
+                i++;
+            } //line is a variable declaration;
+            else if (checkOneLiner(codeLines[i], VARIABLE_PATTERN)) {
+                parseVariableLine(codeLines[i]);
+                i++;
+            } //line is a code block;
+            else if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
+                parseBlock(i);
+            }// TODO handle the situation when line is a method decleration
+
+        }
     }
 
     public CodeBlock getParent() {
         return parent;
     }
 
-    protected void linesToBlocks() throws Exception {
-        int i = 0;
-        while (i < codeLines.length) {
-            if (checkOneLiner(codeLines[i], IGNORE_LINE_PATTERN)) {
-                i++;
-            } else if (checkOneLiner(codeLines[i], VARIABLE_PATTERN)) {
-                parseVariableLine(codeLines[i]);
-                i++;
-            } else {
-                if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
-                    int firstLine = i;
-                    int openCounter = 1, closedCounter = 0;
-                    i++;
-                    while (openCounter != closedCounter && i < codeLines.length) {
-                        if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
-                            openCounter++;
-                        } else if (checkOneLiner(codeLines[i], CLOSE_BLOCK_PATTERN)) {
-                            closedCounter++;
-                        }
-                        i++;
-                    }
-                    String[] methodLines = Arrays.copyOfRange(codeLines, firstLine, i - 1);
-                    innerBlocks.add(BlockFactory.blockFactory(this, codeLines[firstLine], methodLines));
-                }
-
-            }
-        }
+    public List<Variables> getInnerVariables() {
+        return innerVariables;
     }
-
+    public Variables hasVariable(String name)throws LogicalException{
+        CodeBlock codeBlock = this;
+        while (codeBlock.getParent()!= null) {
+            for (Variables variable : codeBlock.getInnerVariables()) {
+                if (variable.getName().matches(matcher.group("name"))) {
+                    return variable;
+                }
+            }
+            codeBlock = codeBlock.getParent();
+        } return null;
+    }
     /**
      * @param line         to check
      * @param checkPattern to match
@@ -91,26 +91,52 @@ public abstract class CodeBlock {
     }
 
 
-//    private boolean checkMethod(String line) {
+    //    private boolean checkMethod(String line) {
 //        return true;
 //    }
+    private void parseBlock(int i) throws Exception {
+        try {
+            int firstLine = i;
+            int openCounter = 1, closedCounter = 0;
+            i++;
+            while (openCounter != closedCounter && i < codeLines.length) {
+                if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
+                    openCounter++;
+                } else if (checkOneLiner(codeLines[i], CLOSE_BLOCK_PATTERN)) {
+                    closedCounter++;
+                }
+                i++;
+            }
+            String[] methodLines = Arrays.copyOfRange(codeLines, firstLine, i - 1);
+            innerBlocks.add(BlockFactory.blockFactory(this, codeLines[firstLine], methodLines));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 
-    private void parseVariableLine(String line) {
+    private void parseVariableLine(String line) throws Exception {
         boolean isFinal = false;
+        int numOfVariables = matcher.groupCount() - 1;
         if (matcher.group("final") != null) {
             isFinal = true;
+            numOfVariables--;
         }
         String type = matcher.group("type").trim();
-        String nameAndValues = matcher.group("nameAndValues").trim();
-        pattern = Pattern.compile("^(?:(\\D\\w*=\\w+);)*$", Pattern.MULTILINE);
-        try {
-            while (matcher.find()) {
-                for (int i = 0; i < matcher.groupCount(); i++) {
-                    innerVariables.add(VariableFactory.variableFactory(this, type, isFinal, matcher.group(i)));
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("bad");
+        String namesAndValues = matcher.group("nameAndValues").trim();
+        String[] nameAndValuesArray = namesAndValues.split(",");
+        for (String str : nameAndValuesArray) {
+            innerVariables.add(VariableFactory.variableFactory(this, type, isFinal, str));
         }
+//        try {
+//            for (int i = 0; i < numOfVariables; i++) {
+//                innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group(i)));
+//            }
+//            while (matcher.group("val1") != null) {
+//                innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("val1")));
+//            }
+//            innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("mainval")));
+//        } catch (Exception e) {
+//            System.out.println("bad");
+//        }
     }
 }
