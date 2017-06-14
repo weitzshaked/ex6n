@@ -42,7 +42,6 @@ public abstract class CodeBlock {
         this.codeLines = codeLines;
         this.innerVariables = new ArrayList<>();
         this.innerBlocks = new ArrayList<>();
-        linesToBlocks();
     }
 
     protected void linesToBlocks() throws Exception {
@@ -57,7 +56,8 @@ public abstract class CodeBlock {
                 i++;
             } //line is the beginning of a code block;
             else if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
-                parseBlock(i);
+                i = parseBlock(i);
+                //line is an assignment of an existing variable:
             } else if (checkOneLiner(codeLines[i], VARIABLE_ASSIGNMENT_PATTERN)) {
                 boolean foundVariable = false;
                 for (Variables variable : innerVariables) {
@@ -71,6 +71,9 @@ public abstract class CodeBlock {
                 if (!foundVariable) throw new LogicalException();
             }
         }// TODO line is a method call
+        for (CodeBlock block:innerBlocks){
+            block.linesToBlocks();
+        }
     }
 
     public CodeBlock getParent() {
@@ -116,7 +119,7 @@ public abstract class CodeBlock {
     //    private boolean checkMethod(String line) {
 //        return true;
 //    }
-    private void parseBlock(int i) throws Exception {
+    private int parseBlock(int i) throws Exception {
         try {
             int firstLine = i;
             int openCounter = 1, closedCounter = 0;
@@ -134,6 +137,7 @@ public abstract class CodeBlock {
         } catch (Exception e) {
             throw e;
         }
+        return i;
     }
 
     private void parseVariableLine(String line) throws Exception {

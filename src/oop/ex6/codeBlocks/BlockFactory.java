@@ -12,10 +12,10 @@ public class BlockFactory {
 
     //todo switch case method, condition
     public static CodeBlock blockFactory(CodeBlock parent, String line, String[] innerLines) throws Exception {
-        Pattern pattern = Pattern.compile("/s*(/w+)/s*(\\(/w.*?\\))/s*\\{/s*");
+        Pattern pattern = Pattern.compile("\\s*(?<method>\\w+)\\s*(\\((?<params>\\w.*?)\\))\\s*\\{\\s*");
         Matcher matcher = pattern.matcher(line);
         if(matcher.matches()) {
-            switch (matcher.group(1).trim()) {
+            switch (matcher.group("method")) {
                 case "if":
                     return new ConditionBlock(parent, innerLines, matcher.group(2), ConditionBlock.Type.If);
                 case "while":
