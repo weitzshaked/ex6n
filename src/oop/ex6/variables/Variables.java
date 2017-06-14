@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
  */
 public class Variables {
 
+
     private boolean hasData = false;
     private String name, type;
     private boolean isFinal = false;

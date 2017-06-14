@@ -16,5 +16,4 @@ public class Method extends CodeBlock {
         //todo split parameters, create
         this.name = name;
     }
-
 }
