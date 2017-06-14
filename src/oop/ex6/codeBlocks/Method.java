@@ -9,11 +9,13 @@ import oop.ex6.variables.Variables;
 public class Method extends CodeBlock {
 
     private String name;
-    private Variables[] parameters;
+    private int paramNum = 0;
 
     public Method(CodeBlock parent, String[] codeLines, String name, String parameters) throws Exception{
         super(parent, codeLines);
         //todo split parameters, create
         this.name = name;
+        //todo add param to inner variables
+        linesToBlocks();
     }
 }

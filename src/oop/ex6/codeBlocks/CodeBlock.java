@@ -37,7 +37,6 @@ public abstract class CodeBlock {
     public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D\\w*)\\s*\\((?<param>\\D\\w*,)*\\s*(?<lastParam>\\D\\w*)\\s*;";
     public static final String VARIABLE_ASSIGNMENT_PATTERN = "(?<name>\\s*\\D\\w*)((\\s*=\\s*(?<value>.+)?\\s*))(?<ending>;\\s*)";
 
-
     public CodeBlock(CodeBlock parent, String[] codeLines) throws Exception {
         this.parent = parent;
         this.codeLines = codeLines;
@@ -60,7 +59,6 @@ public abstract class CodeBlock {
                 i = parseBlock(i);
                 //line is an assignment of an existing variable:
             } else if (checkOneLiner(codeLines[i], VARIABLE_ASSIGNMENT_PATTERN)) {
-                // assignValue
                 boolean foundVariable = false;
                 for (Variables variable : innerVariables) {
                     if (variable.getName().equals(matcher.group("name"))) {

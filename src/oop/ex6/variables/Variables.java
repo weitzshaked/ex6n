@@ -1,7 +1,6 @@
 package oop.ex6.variables;
 
 import oop.ex6.Exceptions.LogicalException;
-import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.codeBlocks.CodeBlock;
 
 import java.util.regex.Matcher;
@@ -23,7 +22,7 @@ public class Variables {
         STRING("String", "\".*\""),
         DOUBLE("double", "\\d+(\\.\\d+)?"),
         BOOLEAN("boolean", "true|false|\\d+(\\.\\d+)?"),
-        CHAR("char", ". | \\w | \\s");
+        CHAR("char", "\'(. | \\w | \\s)?\'");
 
         private final String pattern, name;
 
@@ -43,7 +42,6 @@ public class Variables {
         this.isFinal = isFinal;
     }
 
-
     public void updateData(String data) throws LogicalException {
         if (isFinal) {
             throw new LogicalException();
@@ -56,11 +54,8 @@ public class Variables {
                         this.hasData = true;
                         break;
                     } else {
-                        Variables variable = codeBlock.hasVariable(data);
-                        if (variable != null) {
-                            if (typeCondition(type, variable.getType())) {
-                                hasData = true;
-                            }
+                        if (canAssign(data)) {
+                            hasData = true;
                         } else {
                             throw new LogicalException();
                         }
@@ -71,19 +66,30 @@ public class Variables {
         }
     }
 
-    public boolean typeCondition(String type1, String type2) {
-        if (type1.equals(type2)) {
-            return true;
-        } else {
-            switch (type1) {
-                case "boolean":
-                    return type2.equals("int") || type2.equals("double");
-                case "double":
-                    return type2.equals("int");
+    public boolean canAssign(String data) throws LogicalException {
+        Variables variable = codeBlock.findVariable(data);
+        if (variable != null) {
+            if (variable.hasData()) {
+                if (type.equals(variable.getType())) {
+                    return true;
+                } else {
+                    switch (type) {
+                        case "boolean":
+                            return variable.getType().equals("int") || variable.getType().equals("double");
+                        case "double":
+                            return variable.getType().equals("int");
+                    }
+                }
             }
         }
-        return false;
+        throw new LogicalException();
     }
+
+
+    public boolean hasData() {
+        return hasData;
+    }
+
 
     public String getName() {
         return name;
