@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class VariableFactory {
 
     public static Variables variableFactory(CodeBlock codeBlock, String type, boolean isFinal, String nameAndVal) throws Exception {
-        Pattern pattern = Pattern.compile("(?<name>\\s*\\w+)((?<equal>\\s*=\\s*)(?<value>.+\\w+.*))?");
+        Pattern pattern = Pattern.compile("(?<name>\\s*\\w+)((?<equal>\\s*=\\s*)(?<value>.*\\w+.*))?");
         Matcher matcher = pattern.matcher(nameAndVal);
         String val = null;
         if (matcher.matches()) {

@@ -19,9 +19,9 @@ public class Variables {
 
     private enum Types {
         INT("int", "-?\\d+"),
-        STRING("String", ".*"),
-        DOUBLE("double", "\\d+/.\\d+"),
-        BOOLEAN("boolean", "true | false"),
+        STRING("String", "\".*\""),
+        DOUBLE("double", "\\d+(\\.\\d+)?"),
+        BOOLEAN("boolean", "true|false|\\d+(\\.\\d+)?"),
         CHAR("char", ". | \\w | \\s");
 
         private final String pattern, name;
@@ -33,12 +33,12 @@ public class Variables {
     }
 
     public Variables(CodeBlock codeBlock, String type, String data, String name, boolean isFinal) throws Exception {
+        this.name = name;
+        this.type = type;
         this.codeBlock = codeBlock;
         if (data != null) {
             updateData(data);
         }
-        this.name = name;
-        this.type = type;
         this.isFinal = isFinal;
     }
 
@@ -54,11 +54,11 @@ public class Variables {
                     if (matcher.matches()) {
                         this.hasData = true;
                         break;
-                    }
-                    else {
+                    } else {
                         Variables variable = codeBlock.hasVariable(data);
                         if (variable != null) {
                             if (variable.getType().equals(type)) {
+                                //TODO double/int to boolean, double to int!
                                 hasData = true;
                             }
                         } else {

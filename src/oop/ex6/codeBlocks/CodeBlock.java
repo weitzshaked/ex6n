@@ -76,16 +76,20 @@ public abstract class CodeBlock {
 
     public Variables hasVariable(String name) {
         CodeBlock codeBlock = this;
-        while (codeBlock.getParent() != null) {
+        while (codeBlock.getInnerVariables()!=null) {
             for (Variables variable : codeBlock.getInnerVariables()) {
                 if (variable.getName().equals(name)) {
                     return variable;
                 }
             }
-            codeBlock = codeBlock.getParent();
+            if (codeBlock.getParent() != null) {
+                codeBlock = codeBlock.getParent();
+            }
+            else return null;
         }
         return null;
     }
+
 
     /**
      * @param line         to check
@@ -139,5 +143,4 @@ public abstract class CodeBlock {
 //        CodeBlock block = this;
 //        for (b method:block.getInnerBlocks())
 //    }
-    //shittyshit
 }
