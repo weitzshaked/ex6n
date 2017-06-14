@@ -44,6 +44,7 @@ public abstract class CodeBlock {
         this.codeLines = codeLines;
         this.innerVariables = new ArrayList<>();
         this.innerBlocks = new ArrayList<>();
+        //todo split method from condition
     }
 
     protected void linesToBlocks() throws Exception {
@@ -170,7 +171,6 @@ public abstract class CodeBlock {
     }
 
 //    protected Method findMethod() {
-//        CodeBlock block = this;
-//        for (b method:block.getInnerBlocks())
+//        for (Method method: innerBlocks){}
 //    }
 }

@@ -1,5 +1,6 @@
 package oop.ex6.codeBlocks;
 
+import oop.ex6.Exceptions.LogicalException;
 import oop.ex6.variables.Variables;
 
 import java.util.regex.Matcher;
@@ -37,10 +38,13 @@ public class ConditionBlock extends CodeBlock {
         else {
             Variables variable = findVariable(condition.trim());
             if (variable != null){
+                //todo variable data check pattern
                 if (variable.canAssign(condition.trim())){
                     this.condition = condition;
                 }
-
+            }
+            else {
+                throw new LogicalException();
             }
 
         }
