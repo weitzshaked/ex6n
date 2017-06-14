@@ -1,7 +1,6 @@
 package oop.ex6.variables;
 
 import oop.ex6.Exceptions.LogicalException;
-import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.codeBlocks.CodeBlock;
 
 import java.util.regex.Matcher;
@@ -22,7 +21,7 @@ public class Variables {
         STRING("String", "\".*\""),
         DOUBLE("double", "\\d+(\\.\\d+)?"),
         BOOLEAN("boolean", "true|false|\\d+(\\.\\d+)?"),
-        CHAR("char", ". | \\w | \\s");
+        CHAR("char", "\'(. | \\w | \\s)?\'");
 
         private final String pattern, name;
 
@@ -42,7 +41,6 @@ public class Variables {
         this.isFinal = isFinal;
     }
 
-
     public void updateData(String data) throws LogicalException {
         if (isFinal) {
             throw new LogicalException();
@@ -55,9 +53,9 @@ public class Variables {
                         this.hasData = true;
                         break;
                     } else {
-                        Variables variable = codeBlock.hasVariable(data);
+                        Variables variable = codeBlock.findVariable(data);
                         if (variable != null) {
-                            if (typeCondition(type, variable.getType())) {
+                            if (typeCondition(type, variable.getType()) && variable.hasData()) {
                                 hasData = true;
                             }
                         } else {
@@ -68,6 +66,10 @@ public class Variables {
 
             }
         }
+    }
+
+    public boolean hasData() {
+        return hasData;
     }
 
     public boolean typeCondition(String type1, String type2) {

@@ -37,6 +37,8 @@ public abstract class CodeBlock {
     public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D\\w*)\\s*\\((?<param>\\D\\w*,)*\\s*(?<lastParam>\\D\\w*)\\s*;";
     public static final String VARIABLE_ASSIGNMENT_PATTERN = "(?<name>\\s*\\D\\w*)((\\s*=\\s*(?<value>.+)?\\s*))(?<ending>;\\s*)";
 
+    private static boolean isGlobal = true;
+
     public CodeBlock(CodeBlock parent, String[] codeLines) throws Exception {
         this.parent = parent;
         this.codeLines = codeLines;
@@ -59,18 +61,24 @@ public abstract class CodeBlock {
                 i = parseBlock(i);
                 //line is an assignment of an existing variable:
             } else if (checkOneLiner(codeLines[i], VARIABLE_ASSIGNMENT_PATTERN)) {
-                boolean foundVariable = false;
-                for (Variables variable : innerVariables) {
-                    if (variable.getName().equals(matcher.group("name"))) {
-                        variable.updateData(matcher.group("value"));
-                        i++;
-                        foundVariable = true;
-                        break;
-                    }
+                Variables variable = findInnerVariable(this,matcher.group("name"));
+                if(variable != null){
+                    variable.updateData(matcher.group("value"));
+                    i++;
                 }
-                if (!foundVariable) throw new LogicalException();
+                else throw new LogicalException();
             }
-        }// TODO line is a method call
+            // line is a call to a method
+            else if (checkOneLiner(codeLines[i], METHOD_CALL_PATTERN)){
+                if(isGlobal){
+                    throw new LogicalException();
+                }
+                else {
+
+                }
+            }
+            isGlobal = false;
+        }
         for (CodeBlock block:innerBlocks){
             block.linesToBlocks();
         }
@@ -88,13 +96,13 @@ public abstract class CodeBlock {
         return innerBlocks;
     }
 
-    public Variables hasVariable(String name) {
+    public Variables findVariable(String name) {
         CodeBlock codeBlock = this;
+        Variables variable;
         while (codeBlock.getInnerVariables() != null) {
-            for (Variables variable : codeBlock.getInnerVariables()) {
-                if (variable.getName().equals(name)) {
-                    return variable;
-                }
+            variable = findInnerVariable(codeBlock, name);
+            if(variable != null){
+                return variable;
             }
             if (codeBlock.getParent() != null) {
                 codeBlock = codeBlock.getParent();
@@ -103,6 +111,14 @@ public abstract class CodeBlock {
         return null;
     }
 
+    public Variables findInnerVariable(CodeBlock codeBlock, String name){
+        for (Variables variable : codeBlock.getInnerVariables()) {
+            if (variable.getName().equals(name)) {
+                return variable;
+            }
+        }
+        return null;
+    }
 
     /**
      * @param line         to check
@@ -133,7 +149,7 @@ public abstract class CodeBlock {
                 i++;
             }
             String[] methodLines = Arrays.copyOfRange(codeLines, firstLine, i - 1);
-            innerBlocks.add(BlockFactory.blockFactory(this, codeLines[firstLine], methodLines));
+            innerBlocks.add(BlockFactory.blockFactory(this, codeLines[firstLine], methodLines, isGlobal));
         } catch (Exception e) {
             throw e;
         }

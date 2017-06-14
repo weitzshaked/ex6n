@@ -20,8 +20,8 @@ public class VariableFactory {
                 val = matcher.group("value");
             }
         }
-        //checks if name exists
-        if(codeBlock.hasVariable(matcher.group("name"))!= null){
+        //checks if name exists in block
+        if(codeBlock.findInnerVariable(codeBlock, matcher.group("name"))!= null){
             throw new LogicalException();
         }
         switch (type) {
