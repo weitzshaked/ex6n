@@ -61,7 +61,7 @@ public abstract class CodeBlock {
                 i = parseBlock(i);
                 //line is an assignment of an existing variable:
             } else if (checkOneLiner(codeLines[i], VARIABLE_ASSIGNMENT_PATTERN)) {
-                Variables variable = findInnerVariable(this,matcher.group("name"));
+                Variables variable = findVariable(matcher.group("name"));
                 if(variable != null){
                     variable.updateData(matcher.group("value"));
                     i++;
@@ -125,7 +125,7 @@ public abstract class CodeBlock {
      * @param checkPattern to match
      * @return true if line matches pattern
      */
-    private boolean checkOneLiner(String line, String checkPattern) {
+    protected boolean checkOneLiner(String line, String checkPattern) {
         pattern = Pattern.compile(checkPattern);
         matcher = pattern.matcher(line);
         return matcher.matches();

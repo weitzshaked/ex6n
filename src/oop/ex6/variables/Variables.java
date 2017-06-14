@@ -53,11 +53,8 @@ public class Variables {
                         this.hasData = true;
                         break;
                     } else {
-                        Variables variable = codeBlock.findVariable(data);
-                        if (variable != null) {
-                            if (typeCondition(type, variable.getType()) && variable.hasData()) {
-                                hasData = true;
-                            }
+                        if (canAssign(data)) {
+                            hasData = true;
                         } else {
                             throw new LogicalException();
                         }
@@ -68,23 +65,30 @@ public class Variables {
         }
     }
 
+    public boolean canAssign(String data) throws LogicalException {
+        Variables variable = codeBlock.findVariable(data);
+        if (variable != null) {
+            if (variable.hasData()) {
+                if (type.equals(variable.getType())) {
+                    return true;
+                } else {
+                    switch (type) {
+                        case "boolean":
+                            return variable.getType().equals("int") || variable.getType().equals("double");
+                        case "double":
+                            return variable.getType().equals("int");
+                    }
+                }
+            }
+        }
+        throw new LogicalException();
+    }
+
+
     public boolean hasData() {
         return hasData;
     }
 
-    public boolean typeCondition(String type1, String type2) {
-        if (type1.equals(type2)) {
-            return true;
-        } else {
-            switch (type1) {
-                case "boolean":
-                    return type2.equals("int") || type2.equals("double");
-                case "double":
-                    return type2.equals("int");
-            }
-        }
-        return false;
-    }
 
     public String getName() {
         return name;
