@@ -15,7 +15,7 @@ public class BlockFactory {
         Pattern pattern = Pattern.compile("/s*(/w+)/s*(\\(/w.*?\\))/s*\\{/s*");
         Matcher matcher = pattern.matcher(line);
         if(matcher.matches()) {
-            switch (matcher.group(1)) {
+            switch (matcher.group(1).trim()) {
                 case "if":
                     return new ConditionBlock(parent, innerLines, matcher.group(2), ConditionBlock.Type.If);
                 case "while":

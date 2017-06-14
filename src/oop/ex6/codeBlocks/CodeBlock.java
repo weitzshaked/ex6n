@@ -53,10 +53,11 @@ public abstract class CodeBlock {
             else if (checkOneLiner(codeLines[i], VARIABLE_PATTERN)) {
                 parseVariableLine(codeLines[i]);
                 i++;
-            } //line is a code block;
+            } //line is the beginning of a code block;
             else if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
                 parseBlock(i);
-            }// TODO handle the situation when line is a method decleration
+            }// TODO line is a method call
+            // TODO line is an assignment in an existing method
 
         }
     }
@@ -69,9 +70,13 @@ public abstract class CodeBlock {
         return innerVariables;
     }
 
-    public Variables hasVariable(String name){
+    public List<CodeBlock> getInnerBlocks() {
+        return innerBlocks;
+    }
+
+    public Variables hasVariable(String name) {
         CodeBlock codeBlock = this;
-        while (codeBlock.getParent()!= null) {
+        while (codeBlock.getParent() != null) {
             for (Variables variable : codeBlock.getInnerVariables()) {
                 if (variable.getName().equals(name)) {
                     return variable;
@@ -128,16 +133,10 @@ public abstract class CodeBlock {
         for (String str : nameAndValuesArray) {
             innerVariables.add(VariableFactory.variableFactory(this, type, isFinal, str));
         }
-//        try {
-//            for (int i = 0; i < numOfVariables; i++) {
-//                innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group(i)));
-//            }
-//            while (matcher.group("val1") != null) {
-//                innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("val1")));
-//            }
-//            innerVariables.add(VariableFactory.variableFactory(type, isFinal, matcher.group("mainval")));
-//        } catch (Exception e) {
-//            System.out.println("bad");
-//        }
     }
+
+//    protected Method findMethod() {
+//        CodeBlock block = this;
+//        for (b method:block.getInnerBlocks())
+//    }
 }
