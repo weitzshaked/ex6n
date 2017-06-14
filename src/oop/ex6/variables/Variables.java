@@ -57,8 +57,7 @@ public class Variables {
                     } else {
                         Variables variable = codeBlock.hasVariable(data);
                         if (variable != null) {
-                            if (variable.getType().equals(type)) {
-                                //TODO double/int to boolean, double to int!
+                            if (typeCondition(variable.getType(),type)) {
                                 hasData = true;
                             }
                         } else {
@@ -69,6 +68,21 @@ public class Variables {
 
             }
         }
+    }
+
+    public boolean typeCondition(String type1, String type2){
+        if(type1.equals(type2)){
+            return true;
+        }
+        else {
+            switch (type1) {
+                case "boolean":
+                    return type2.equals("int") || type2.equals("double");
+                case "double":
+                    return type2.equals("int");
+            }
+        }
+        return false;
     }
 
     public String getName() {
