@@ -11,7 +11,14 @@ public class ConditionBlock extends CodeBlock {
 
     public enum Type {If, While}
 
-
+    /**
+     * creates a new condition block
+     * @param parent block
+     * @param codeLines inner code lines
+     * @param condition block's condition
+     * @param type if/ while block
+     * @throws Exception
+     */
     public ConditionBlock(CodeBlock parent, String[] codeLines, String condition, Type type) throws Exception {
         super(parent, codeLines);
         //todo check condition pattern

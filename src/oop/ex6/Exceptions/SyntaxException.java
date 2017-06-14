@@ -1,7 +1,7 @@
 package oop.ex6.Exceptions;
 
 /**
- * Syntex Exception
+ * Syntax Exception
  */
 public class SyntaxException extends Exception{
 
