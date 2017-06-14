@@ -1,5 +1,6 @@
 package oop.ex6.codeBlocks;
 
+import com.sun.org.apache.xpath.internal.operations.Variable;
 import oop.ex6.Exceptions.LogicalException;
 import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.variables.VariableFactory;
@@ -34,6 +35,7 @@ public abstract class CodeBlock {
     public static final String OPEN_BLOCK_PATTERN = ".*?\\{\\s*";
     public static final String CLOSE_BLOCK_PATTERN = "\\s*\\}\\s*";
     public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D\\w*)\\s*\\((?<param>\\D\\w*,)*\\s*(?<lastParam>\\D\\w*)\\s*;";
+    public static final String VARIABLE_ASSIGNMENT_PATTERN = "(?<name>\\s*\\D\\w*)((\\s*=\\s*(?<value>.+)?\\s*))(?<ending>;\\s*)";
 
     public CodeBlock(CodeBlock parent, String[] codeLines) throws Exception {
         this.parent = parent;
@@ -56,10 +58,19 @@ public abstract class CodeBlock {
             } //line is the beginning of a code block;
             else if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
                 parseBlock(i);
-            }// TODO line is a method call
-            // TODO line is an assignment in an existing method
-
-        }
+            } else if (checkOneLiner(codeLines[i], VARIABLE_ASSIGNMENT_PATTERN)) {
+                boolean foundVariable = false;
+                for (Variables variable : innerVariables) {
+                    if (variable.getName().equals(matcher.group("name"))) {
+                        variable.updateData(matcher.group("value"));
+                        i++;
+                        foundVariable = true;
+                        break;
+                    }
+                }
+                if (!foundVariable) throw new LogicalException();
+            }
+        }// TODO line is a method call
     }
 
     public CodeBlock getParent() {
@@ -76,7 +87,7 @@ public abstract class CodeBlock {
 
     public Variables hasVariable(String name) {
         CodeBlock codeBlock = this;
-        while (codeBlock.getInnerVariables()!=null) {
+        while (codeBlock.getInnerVariables() != null) {
             for (Variables variable : codeBlock.getInnerVariables()) {
                 if (variable.getName().equals(name)) {
                     return variable;
@@ -84,8 +95,7 @@ public abstract class CodeBlock {
             }
             if (codeBlock.getParent() != null) {
                 codeBlock = codeBlock.getParent();
-            }
-            else return null;
+            } else return null;
         }
         return null;
     }
