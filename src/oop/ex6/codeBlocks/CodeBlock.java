@@ -24,7 +24,7 @@ public abstract class CodeBlock {
 
     protected Matcher matcher;
 
-    private Pattern pattern;
+    protected Pattern pattern;
 
     public static final String IGNORE_LINE_PATTERN = "^///.+|\\s+";
     //public static final String SEMICOLOMPATTERN = ".*?;/s*";
@@ -57,7 +57,7 @@ public abstract class CodeBlock {
                 currentLine++;
             } //line is a variable declaration;
             else if (checkOneLiner(codeLines[currentLine], VARIABLE_PATTERN)) {
-                parseVariableLine(codeLines[currentLine]);
+                parseVariableLine();
             } //line is the beginning of a method;
             else if (checkOneLiner(codeLines[currentLine], METHOD_PATTERN)) {
                 if (isGlobal) {
@@ -162,7 +162,7 @@ public abstract class CodeBlock {
         return Arrays.copyOfRange(codeLines, firstLine, currentLine - 1);
     }
 
-    private void parseVariableLine(String line) throws Exception {
+    protected void parseVariableLine() throws Exception {
         boolean isFinal = false;
         if (matcher.group("final") != null) {
             isFinal = true;
