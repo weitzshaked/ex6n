@@ -12,43 +12,29 @@ import java.util.regex.Pattern;
 public class ConditionBlock extends CodeBlock {
 
     private String condition;
-    private Type type;
+    private String type;
 
     public static final String conditionPattern = "true|false|(\\d+(\\.\\d+)?)";
 
-    public enum Type {
-        If,
-        While
-    }
 
     /**
      * creates a new condition block
-     * @param parent block
+     *
+     * @param parent    block
      * @param codeLines inner code lines
      * @param condition block's condition
-     * @param type if/ while block
+     * @param type      if/ while block
      * @throws Exception
      */
-    public ConditionBlock(CodeBlock parent, String[] codeLines, String condition, Type type) throws Exception {
+    public ConditionBlock(CodeBlock parent, String[] codeLines, String condition, String type) throws Exception {
         super(parent, codeLines);
-        //todo check condition pattern
-        if(checkOneLiner(condition, conditionPattern)){
-            this.condition = condition;
-        }
-        else {
-            Variables variable = findVariable(condition.trim());
-            if (variable != null){
-                //todo variable data check pattern
-                if (variable.canAssign(condition.trim())){
-                    this.condition = condition;
-                }
-            }
-            else {
-                throw new LogicalException();
-            }
-
-        }
         this.type = type;
+        if (checkOneLiner(condition, conditionPattern)) {
+            this.condition = condition;
+        } else if (Variables.canAssign(condition.trim(), parent, "boolean")) {
+            this.condition = condition;
+        } else {
+            throw new LogicalException();
+        }
     }
-
 }

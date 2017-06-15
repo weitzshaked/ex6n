@@ -22,6 +22,7 @@ public class Sjavac {
             String[] lines = new String[allLines.size()];
             lines = allLines.toArray(lines);
             CodeBlock mainBlock = GlobalBlock.getInstance(null, lines);
+            mainBlock.linesToBlocks();
         } catch (IOException e) {
             throw new IOException("ERROR: code file invalid or missing");
         }
