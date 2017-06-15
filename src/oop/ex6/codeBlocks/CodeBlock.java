@@ -22,7 +22,7 @@ public abstract class CodeBlock {
     protected CodeBlock parent;
     protected String[] codeLines;
 
-    private Matcher matcher;
+    protected Matcher matcher;
 
     private Pattern pattern;
 
@@ -35,8 +35,8 @@ public abstract class CodeBlock {
     public static final String CLOSE_BLOCK_PATTERN = "\\s*\\}\\s*";
     public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D\\w*)\\s*\\((?<param>\\D\\w*,)*\\s*(?<lastParam>\\D\\w*)\\s*;";
     public static final String VARIABLE_ASSIGNMENT_PATTERN = "(?<name>\\s*\\D\\w*)((\\s*=\\s*(?<value>.+)?\\s*))(?<ending>;\\s*)";
-    public static final String METHOD_PATTERN = "\\s*(?<blocktype>\\D+)\\s*(?<name>\\D[a-zA-Z0-9_]*)(\\((?<params>\\w.*?)\\))\\s*\\{\\s*";
-    public static final String CONDITION_PATTERN = "\\s*(?<blocktype>\\D+)\\s*(\\((?<params>\\w.*?)\\))\\s*\\{\\s*";
+    public static final String METHOD_PATTERN = "\\s*(?<returnStatement>\\D+)\\s*(?<name>\\D[a-zA-Z0-9_]*)(\\((?<params>\\w.*?)\\))\\s*\\{\\s*";
+    public static final String CONDITION_PATTERN = "\\s*(?<type>\\D+)\\s*(\\((?<condition>\\w.*?)\\))\\s*\\{\\s*";
 
     private static boolean isGlobal = true;
     private int currentLine = 0;
@@ -48,11 +48,9 @@ public abstract class CodeBlock {
         this.innerVariables = new ArrayList<>();
         this.conditions = new ArrayList<>();
         this.methods = new ArrayList<>();
-
-        //todo split method from condition
     }
 
-    protected void linesToBlocks() throws Exception {
+    public void linesToBlocks() throws Exception {
         while (currentLine < codeLines.length) {
             //if line should be ignored (empty or comment);
             if (checkOneLiner(codeLines[currentLine], IGNORE_LINE_PATTERN)) {
@@ -62,16 +60,14 @@ public abstract class CodeBlock {
                 parseVariableLine(codeLines[currentLine]);
             } //line is the beginning of a method;
             else if (checkOneLiner(codeLines[currentLine], METHOD_PATTERN)) {
-                if(isGlobal) {
+                if (isGlobal) {
                     String[] codeLines = parseBlock();
-                    methods.add(new Method(this, codeLines, matcher.group("name"), matcher.group("params")));
-                }
-                else throw new LogicalException();
+                    methods.add(new Method(this, codeLines, matcher.group("name"), matcher.group("params"), matcher.group("returnStatement")));
+                } else throw new LogicalException();
                 //line is the beginning of a condition block;
             } else if (checkOneLiner(codeLines[currentLine], CONDITION_PATTERN)) {
-                String line = codeLines[currentLine];
                 String[] codeLines = parseBlock();
-                conditions.add(BlockFactory.blockFactory(this, line, codeLines, isGlobal));
+                conditions.add(new ConditionBlock(this, codeLines, matcher.group("condition"), matcher.group("type")));
             }//line is an assignment of an existing variable;
             else if (checkOneLiner(codeLines[currentLine], VARIABLE_ASSIGNMENT_PATTERN)) {
                 Variables variable = findVariable(matcher.group("name"));

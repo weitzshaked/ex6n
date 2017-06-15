@@ -12,14 +12,10 @@ import java.util.regex.Pattern;
 public class ConditionBlock extends CodeBlock {
 
     private String condition;
-    private Type type;
+    private String type;
 
     public static final String conditionPattern = "true|false|(\\d+(\\.\\d+)?)";
 
-    public enum Type {
-        If,
-        While
-    }
 
     /**
      * creates a new condition block
@@ -30,7 +26,7 @@ public class ConditionBlock extends CodeBlock {
      * @param type      if/ while block
      * @throws Exception
      */
-    public ConditionBlock(CodeBlock parent, String[] codeLines, String condition, Type type) throws Exception {
+    public ConditionBlock(CodeBlock parent, String[] codeLines, String condition, String type) throws Exception {
         super(parent, codeLines);
         this.type = type;
         if (checkOneLiner(condition, conditionPattern)) {
