@@ -1,8 +1,6 @@
 package oop.ex6.codeBlocks;
 
-import com.sun.org.apache.xpath.internal.operations.Variable;
 import oop.ex6.Exceptions.LogicalException;
-import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.variables.VariableFactory;
 import oop.ex6.variables.Variables;
 
@@ -17,7 +15,8 @@ import java.util.regex.Pattern;
  */
 public abstract class CodeBlock {
 
-    protected List<CodeBlock> innerBlocks;
+    protected List<ConditionBlock> conditions;
+    protected List<Method> methods;
     protected List<Variables> innerVariables;
 
     protected CodeBlock parent;
@@ -36,51 +35,62 @@ public abstract class CodeBlock {
     public static final String CLOSE_BLOCK_PATTERN = "\\s*\\}\\s*";
     public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D\\w*)\\s*\\((?<param>\\D\\w*,)*\\s*(?<lastParam>\\D\\w*)\\s*;";
     public static final String VARIABLE_ASSIGNMENT_PATTERN = "(?<name>\\s*\\D\\w*)((\\s*=\\s*(?<value>.+)?\\s*))(?<ending>;\\s*)";
+    public static final String METHOD_PATTERN = "\\s*(?<blocktype>\\D+)\\s*(?<name>\\D[a-zA-Z0-9_]*)(\\((?<params>\\w.*?)\\))\\s*\\{\\s*";
+    public static final String CONDITION_PATTERN = "\\s*(?<blocktype>\\D+)\\s*(\\((?<params>\\w.*?)\\))\\s*\\{\\s*";
 
     private static boolean isGlobal = true;
+    private int currentLine = 0;
+
 
     public CodeBlock(CodeBlock parent, String[] codeLines) throws Exception {
         this.parent = parent;
         this.codeLines = codeLines;
         this.innerVariables = new ArrayList<>();
-        this.innerBlocks = new ArrayList<>();
+        this.conditions = new ArrayList<>();
+        this.methods = new ArrayList<>();
+
         //todo split method from condition
     }
 
     protected void linesToBlocks() throws Exception {
-        int i = 0;
-        while (i < codeLines.length) {
+        while (currentLine < codeLines.length) {
             //if line should be ignored (empty or comment);
-            if (checkOneLiner(codeLines[i], IGNORE_LINE_PATTERN)) {
-                i++;
+            if (checkOneLiner(codeLines[currentLine], IGNORE_LINE_PATTERN)) {
+                currentLine++;
             } //line is a variable declaration;
-            else if (checkOneLiner(codeLines[i], VARIABLE_PATTERN)) {
-                parseVariableLine(codeLines[i]);
-                i++;
-            } //line is the beginning of a code block;
-            else if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
-                i = parseBlock(i);
-                //line is an assignment of an existing variable:
-            } else if (checkOneLiner(codeLines[i], VARIABLE_ASSIGNMENT_PATTERN)) {
-                Variables variable = findVariable(matcher.group("name"));
-                if(variable != null){
-                    variable.updateData(matcher.group("value"));
-                    i++;
+            else if (checkOneLiner(codeLines[currentLine], VARIABLE_PATTERN)) {
+                parseVariableLine(codeLines[currentLine]);
+            } //line is the beginning of a method;
+            else if (checkOneLiner(codeLines[currentLine], METHOD_PATTERN)) {
+                if(isGlobal) {
+                    String[] codeLines = parseBlock();
+                    methods.add(new Method(this, codeLines, matcher.group("name"), matcher.group("params")));
                 }
                 else throw new LogicalException();
+                //line is the beginning of a condition block;
+            } else if (checkOneLiner(codeLines[currentLine], CONDITION_PATTERN)) {
+                String line = codeLines[currentLine];
+                String[] codeLines = parseBlock();
+                conditions.add(BlockFactory.blockFactory(this, line, codeLines, isGlobal));
+            }//line is an assignment of an existing variable;
+            else if (checkOneLiner(codeLines[currentLine], VARIABLE_ASSIGNMENT_PATTERN)) {
+                Variables variable = findVariable(matcher.group("name"));
+                if (variable != null) {
+                    variable.updateData(matcher.group("value"));
+                    currentLine++;
+                } else throw new LogicalException();
             }
             // line is a call to a method
-            else if (checkOneLiner(codeLines[i], METHOD_CALL_PATTERN)){
-                if(isGlobal){
+            else if (checkOneLiner(codeLines[currentLine], METHOD_CALL_PATTERN)) {
+                if (isGlobal) {
                     throw new LogicalException();
-                }
-                else {
-
+                } else {
+                    //todo method.call function
                 }
             }
             isGlobal = false;
         }
-        for (CodeBlock block:innerBlocks){
+        for (CodeBlock block : conditions) {
             block.linesToBlocks();
         }
     }
@@ -93,8 +103,12 @@ public abstract class CodeBlock {
         return innerVariables;
     }
 
-    public List<CodeBlock> getInnerBlocks() {
-        return innerBlocks;
+    public List<ConditionBlock> getConditions() {
+        return conditions;
+    }
+
+    public List<Method> getMethods() {
+        return methods;
     }
 
     public Variables findVariable(String name) {
@@ -102,7 +116,7 @@ public abstract class CodeBlock {
         Variables variable;
         while (codeBlock.getInnerVariables() != null) {
             variable = findInnerVariable(codeBlock, name);
-            if(variable != null){
+            if (variable != null) {
                 return variable;
             }
             if (codeBlock.getParent() != null) {
@@ -112,7 +126,7 @@ public abstract class CodeBlock {
         return null;
     }
 
-    public Variables findInnerVariable(CodeBlock codeBlock, String name){
+    public Variables findInnerVariable(CodeBlock codeBlock, String name) {
         for (Variables variable : codeBlock.getInnerVariables()) {
             if (variable.getName().equals(name)) {
                 return variable;
@@ -136,25 +150,20 @@ public abstract class CodeBlock {
     //    private boolean checkMethod(String line) {
 //        return true;
 //    }
-    private int parseBlock(int i) throws Exception {
-        try {
-            int firstLine = i;
-            int openCounter = 1, closedCounter = 0;
-            i++;
-            while (openCounter != closedCounter && i < codeLines.length) {
-                if (checkOneLiner(codeLines[i], OPEN_BLOCK_PATTERN)) {
-                    openCounter++;
-                } else if (checkOneLiner(codeLines[i], CLOSE_BLOCK_PATTERN)) {
-                    closedCounter++;
-                }
-                i++;
+
+    private String[] parseBlock() throws Exception {
+        int firstLine = this.currentLine;
+        int openCounter = 1, closedCounter = 0;
+        currentLine++;
+        while (openCounter != closedCounter && currentLine < codeLines.length) {
+            if (checkOneLiner(codeLines[currentLine], OPEN_BLOCK_PATTERN)) {
+                openCounter++;
+            } else if (checkOneLiner(codeLines[currentLine], CLOSE_BLOCK_PATTERN)) {
+                closedCounter++;
             }
-            String[] methodLines = Arrays.copyOfRange(codeLines, firstLine, i - 1);
-            innerBlocks.add(BlockFactory.blockFactory(this, codeLines[firstLine], methodLines, isGlobal));
-        } catch (Exception e) {
-            throw e;
+            currentLine++;
         }
-        return i;
+        return Arrays.copyOfRange(codeLines, firstLine, currentLine - 1);
     }
 
     private void parseVariableLine(String line) throws Exception {
@@ -168,9 +177,10 @@ public abstract class CodeBlock {
         for (String str : nameAndValuesArray) {
             innerVariables.add(VariableFactory.variableFactory(this, type, isFinal, str));
         }
+        currentLine++;
     }
 
 //    protected Method findMethod() {
-//        for (Method method: innerBlocks){}
+//        for (Method method: conditions){}
 //    }
 }

@@ -53,7 +53,7 @@ public class Variables {
                         this.hasData = true;
                         break;
                     } else {
-                        if (canAssign(data)) {
+                        if (canAssign(data, codeBlock, type)) {
                             hasData = true;
                         } else {
                             throw new LogicalException();
@@ -65,14 +65,14 @@ public class Variables {
         }
     }
 
-    public boolean canAssign(String data) throws LogicalException {
-        Variables variable = codeBlock.findVariable(data);
+    public static boolean canAssign(String data, CodeBlock firstCodeBlock, String typeToMatch) throws LogicalException {
+        Variables variable = firstCodeBlock.findVariable(data);
         if (variable != null) {
             if (variable.hasData()) {
-                if (type.equals(variable.getType())) {
+                if (typeToMatch.equals(variable.getType())) {
                     return true;
                 } else {
-                    switch (type) {
+                    switch (typeToMatch) {
                         case "boolean":
                             return variable.getType().equals("int") || variable.getType().equals("double");
                         case "double":

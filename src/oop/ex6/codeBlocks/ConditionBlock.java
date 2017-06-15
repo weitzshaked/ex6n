@@ -23,32 +23,22 @@ public class ConditionBlock extends CodeBlock {
 
     /**
      * creates a new condition block
-     * @param parent block
+     *
+     * @param parent    block
      * @param codeLines inner code lines
      * @param condition block's condition
-     * @param type if/ while block
+     * @param type      if/ while block
      * @throws Exception
      */
     public ConditionBlock(CodeBlock parent, String[] codeLines, String condition, Type type) throws Exception {
         super(parent, codeLines);
-        //todo check condition pattern
-        if(checkOneLiner(condition, conditionPattern)){
-            this.condition = condition;
-        }
-        else {
-            Variables variable = findVariable(condition.trim());
-            if (variable != null){
-                //todo variable data check pattern
-                if (variable.canAssign(condition.trim())){
-                    this.condition = condition;
-                }
-            }
-            else {
-                throw new LogicalException();
-            }
-
-        }
         this.type = type;
+        if (checkOneLiner(condition, conditionPattern)) {
+            this.condition = condition;
+        } else if (Variables.canAssign(condition.trim(), parent, "boolean")) {
+            this.condition = condition;
+        } else {
+            throw new LogicalException();
+        }
     }
-
 }

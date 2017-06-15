@@ -11,8 +11,7 @@ import java.util.regex.Pattern;
  */
 public class BlockFactory {
 
-    //todo switch case method, condition
-    public static CodeBlock blockFactory(CodeBlock parent, String line, String[] innerLines, boolean isGlobal) throws Exception {
+    public static ConditionBlock blockFactory(CodeBlock parent, String line, String[] innerLines, boolean isGlobal) throws Exception {
         Pattern pattern = Pattern.compile("\\s*(?<blocktype>\\w+)\\s*(?<name>\\D[a-zA-Z0-9_]*)?(\\((?<params>\\w.*?)\\))\\s*\\{\\s*");
         Matcher matcher = pattern.matcher(line);
         if (matcher.matches()) {
@@ -21,12 +20,6 @@ public class BlockFactory {
                     return new ConditionBlock(parent, innerLines, matcher.group(2), ConditionBlock.Type.If);
                 case "while":
                     return new ConditionBlock(parent, innerLines, matcher.group(2), ConditionBlock.Type.While);
-                case "void":
-                    if (isGlobal) {
-                        return new Method(parent, innerLines, matcher.group(1), matcher.group(2));
-                    } else {
-                        throw new LogicalException();
-                    }
                 default:
                     throw new SyntaxException();
             }
