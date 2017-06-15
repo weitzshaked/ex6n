@@ -33,13 +33,13 @@ public abstract class CodeBlock {
     //public static final String SINGLE_VARIABLE_PATTERN = "(\\w*\\s+)(\\D\\w*(\\s*=\\s*\\w+)?)";
     public static final String OPEN_BLOCK_PATTERN = ".*?\\{\\s*";
     public static final String CLOSE_BLOCK_PATTERN = "\\s*\\}\\s*";
-    public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D\\w*)\\s*\\((?<param>\\D\\w*,)*\\s*(?<lastParam>\\D\\w*)\\s*;";
+    public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D\\w*)\\s*\\(?<params>((\\w+,)*\\s*(\\w+))?\\s*;";
     public static final String VARIABLE_ASSIGNMENT_PATTERN = "(?<name>\\s*\\D\\w*)((\\s*=\\s*(?<value>.+)?\\s*))(?<ending>;\\s*)";
     public static final String METHOD_PATTERN = "\\s*(?<returnStatement>\\D+)\\s*(?<name>\\D[a-zA-Z0-9_]*)(\\((?<params>\\w.*?)\\))\\s*\\{\\s*";
     public static final String CONDITION_PATTERN = "\\s*(?<type>\\D+)\\s*(\\((?<condition>\\w.*?)\\))\\s*\\{\\s*";
 
     private static boolean isGlobal = true;
-    private int currentLine = 0;
+    protected int currentLine = 0;
 
 
     public CodeBlock(CodeBlock parent, String[] codeLines) throws Exception {
@@ -81,12 +81,19 @@ public abstract class CodeBlock {
                 if (isGlobal) {
                     throw new LogicalException();
                 } else {
-                    //todo method.call function
+                    Method method = findMethod(matcher.group("methodName"));
+                    if(method !=null){
+                        method.methodCall(matcher.group("params"));
+                    }
+                    else throw new LogicalException();
                 }
             }
             isGlobal = false;
         }
-        for (CodeBlock block : conditions) {
+        for(Method method: methods){
+            method.linesToBlocks();
+        }
+        for (ConditionBlock block : conditions) {
             block.linesToBlocks();
         }
     }
@@ -176,7 +183,20 @@ public abstract class CodeBlock {
         currentLine++;
     }
 
-//    protected Method findMethod() {
-//        for (Method method: conditions){}
-//    }
+    protected boolean hasParent(){
+        return parent != null;
+    }
+
+    protected Method findMethod(String name) {
+        CodeBlock codeBlock = this;
+        while (!codeBlock.hasParent()){
+            codeBlock = codeBlock.getParent();
+        }
+        for (Method method: codeBlock.getMethods()){
+            if(method.getName().equals(name)){
+                return method;
+            }
+        }
+        return null;
+    }
 }

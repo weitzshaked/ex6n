@@ -1,8 +1,10 @@
 package oop.ex6.codeBlocks;
 
+import oop.ex6.Exceptions.LogicalException;
 import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.variables.VariableFactory;
 
+import java.util.Iterator;
 import java.util.regex.Pattern;
 
 /**
@@ -14,7 +16,7 @@ public class Method extends CodeBlock {
     private int paramNum = 0;
     public static final String PARAM_PATTERN = "((?<modifier>final )?\\s*(?<type>\\D+)\\s+(?<name>\\D+[A-Za-z0-9_]*))";
     public static final String PARAM_LINE_PATTERN = "(?<params>" + PARAM_PATTERN + "," + PARAM_PATTERN + ")";
-
+    public static final String GENERIC_PARAM_DATA = "0";
 
     public Method(CodeBlock parent, String[] codeLines, String name, String parameters, String returnStatement) throws Exception {
         super(parent, codeLines);
@@ -34,6 +36,7 @@ public class Method extends CodeBlock {
                         }
                         String type = matcher.group("type");
                         innerVariables.add(VariableFactory.variableFactory(this, type, isFinal, str));
+                        innerVariables.get(paramNum).updateData(GENERIC_PARAM_DATA);
                         paramNum++;
                     } else throw new SyntaxException();
                 }
@@ -44,5 +47,20 @@ public class Method extends CodeBlock {
         else throw new SyntaxException();
     }
 
+    public String getName() {
+        return name;
+    }
 
+    public void methodCall(String paramLine) throws LogicalException{
+        String[] params = paramLine.split(",");
+        if(params.length != paramNum){
+            throw new LogicalException();
+        }
+        else{
+            for (int i=0; i<paramNum;i++){
+                innerVariables.get(i).updateData(params[i]);
+            }
+        }
+        currentLine++;
+    }
 }
