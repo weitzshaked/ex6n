@@ -12,17 +12,17 @@ import java.util.regex.Pattern;
 public class VariableFactory {
 
     public static Variables variableFactory(CodeBlock codeBlock, String type, boolean isFinal, String nameAndVal) throws Exception {
-        Pattern pattern = Pattern.compile("(?<name>\\s*\\D[A-Za-z0-9_]*)((?<equal>\\s*=\\s*)(?<value>.*\\w+.*))?");
+        Pattern pattern = Pattern.compile("(?<name>\\s*\\D[A-Za-z0-9_]*\\s*)((?<equal>=\\s*)(?<value>.*\\w+.*))?");
         Matcher matcher = pattern.matcher(nameAndVal);
         String val = null;
         if (matcher.matches()) {
             if (matcher.group("value") != null) {
                 val = matcher.group("value");
             }
-        }
-        //checks if name exists in block
-        if(codeBlock.findInnerVariable(codeBlock, matcher.group("name"))!= null){
-            throw new LogicalException("variable name already defined ");
+            //checks if name exists in block
+            if(codeBlock.findInnerVariable(codeBlock, matcher.group("name"))!= null){
+                throw new LogicalException("variable name already defined ");
+            }
         }
 
         switch (type) {

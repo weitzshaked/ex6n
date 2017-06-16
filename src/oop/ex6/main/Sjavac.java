@@ -30,6 +30,9 @@ public class Sjavac {
         catch (SyntaxException e) {
             throw e;
         }
+        catch (LogicalException e){
+            throw e;
+        }
     }
 
 
@@ -42,6 +45,7 @@ public class Sjavac {
             System.out.println(e.getMessage());
         }catch (Exception e) {
             System.out.println(1);
+            System.out.println(e);
         }
     }
 }

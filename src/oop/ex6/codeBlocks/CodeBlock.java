@@ -1,6 +1,7 @@
 package oop.ex6.codeBlocks;
 
 import oop.ex6.Exceptions.LogicalException;
+import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.variables.VariableFactory;
 import oop.ex6.variables.Variables;
 
@@ -26,18 +27,18 @@ public abstract class CodeBlock {
 
     protected Pattern pattern;
 
-    public static final String IGNORE_LINE_PATTERN = "^\\/.+|\\s*|return";
+    public static final String IGNORE_LINE_PATTERN = "^\\/.+|\\s*|\\s*return;";
     public static final String VARIABLE_PATTERN = "(?<final>\\s*final\\s+)?(?<type>\\w*\\s+)(?<nameAndValues>(\\D\\w*(\\s*=\\s*\\.+)?(\\s*,))*" +
             "(\\s*\\D\\w*(\\s*=\\s*.+)?\\s*))(?<ending>;\\s*)";
     public static final String OPEN_BLOCK_PATTERN = ".*?\\{\\s*";
     public static final String CLOSE_BLOCK_PATTERN = "\\s*\\}\\s*";
-    public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D[A-Za-z0-9_]*)\\s*\\(?<params>((\\w+,)*\\s*(\\w+))?\\s*;";
+    public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D[A-Za-z0-9_]*\\s*)\\((?<params>(\\w+,)*\\s*(\\w+)?\\))\\s*;";
     public static final String VARIABLE_ASSIGNMENT_PATTERN = "(?<name>\\s*\\D[A-Za-z0-9_]*)((\\s*=\\s*(?<value>.+)?\\s*))(?<ending>;\\s*)";
-    public static final String METHOD_PATTERN = "\\s*(?<returnStatement>\\D+)\\s*(?<name>\\D[a-zA-Z0-9_]*)(\\((?<params>\\w.*?)\\))\\s*\\{\\s*";
-    public static final String CONDITION_PATTERN = "\\s*(?<type>\\D+)\\s*(\\((?<condition>\\w.*?)\\))\\s*\\{\\s*";
+    public static final String METHOD_PATTERN = "\\s*(?<returnStatement>\\D+\\s+)(?<name>\\D[a-zA-Z0-9_]*)\\((?<params>\\w.*\\s*)*\\)\\s*\\{\\s*";
+    public static final String CONDITION_PATTERN = "\\s*(?<type>\\D+\\s*)(\\((?<condition>\\w.*?)\\))\\s*\\{\\s*";
 
     private static boolean isGlobal = true;
-    protected int currentLine = 0;
+    protected static int currentLine = 0;
 
 
     public CodeBlock(CodeBlock parent, String[] codeLines) throws Exception {
@@ -65,12 +66,18 @@ public abstract class CodeBlock {
             } //line is the beginning of a method;
             else if (checkOneLiner(codeLines[currentLine], METHOD_PATTERN)) {
                 if (isGlobal) {
-                    String[] codeLines = parseBlock();
-                    methods.add(new Method(this, codeLines, matcher.group("name"), matcher.group("params"), matcher.group("returnStatement")));
-                } else throw new LogicalException("method declared in wrong block "+ currentLine);
+                    String methodStatement = codeLines[currentLine];
+                    String[] innerCodeLines = parseBlock();
+                    //reset matcher to method pattern
+                    checkOneLiner(methodStatement, METHOD_PATTERN);
+                    methods.add(new Method(this, innerCodeLines, matcher.group("name"), matcher.group("params"), matcher.group("returnStatement")));
+                } else throw new LogicalException("method declared in wrong block " + currentLine);
                 //line is the beginning of a condition block;
             } else if (checkOneLiner(codeLines[currentLine], CONDITION_PATTERN)) {
+                String conditionStatement = codeLines[currentLine];
                 String[] codeLines = parseBlock();
+                //reset to condition pattern
+                checkOneLiner(conditionStatement, CONDITION_PATTERN);
                 conditions.add(new ConditionBlock(this, codeLines, matcher.group("condition"), matcher.group("type")));
             }//line is an assignment of an existing variable;
             else if (checkOneLiner(codeLines[currentLine], VARIABLE_ASSIGNMENT_PATTERN)) {
@@ -88,12 +95,14 @@ public abstract class CodeBlock {
                     Method method = findMethod(matcher.group("methodName"));
                     if (method != null) {
                         method.methodCall(matcher.group("params"));
-                    } else throw new LogicalException("no such method " + currentLine);
+                    } else throw new LogicalException("no such method " + currentLine+1);
                 }
             }
-            isGlobal = false;
+            else throw new SyntaxException("bad line syntax "+ (currentLine+1));
         }
+        isGlobal = false;
         for (Method method : methods) {
+            currentLine = 0;
             method.linesToBlocks();
         }
         for (ConditionBlock block : conditions) {
@@ -181,7 +190,7 @@ public abstract class CodeBlock {
      * @throws Exception
      */
     private String[] parseBlock() throws Exception {
-        int firstLine = this.currentLine;
+        int firstLine = this.currentLine+1;
         int openCounter = 1, closedCounter = 0;
         currentLine++;
         while (openCounter != closedCounter && currentLine < codeLines.length) {

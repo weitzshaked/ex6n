@@ -12,7 +12,7 @@ public class ConditionBlock extends CodeBlock {
     private String[] conditions;
     private String type;
 
-    public static final String conditionPattern = "(true|false|(\\d+(\\.\\d+)?)";
+    public static final String conditionPattern = "\\s*(true|false|(\\d+(\\.\\d+)?))\\s*";
 
 
     /**
@@ -29,9 +29,10 @@ public class ConditionBlock extends CodeBlock {
         this.type = type;
         this.conditions = conditionsLine.split("(\\|{2})|(&{2})");
         for (String condition : conditions) {
-            if (!checkOneLiner(condition, conditionPattern) ||
-                    !Variables.canAssign(condition, parent, "boolean")) {
-                throw new LogicalException("bad condition syntax ");
+            if (!checkOneLiner(condition, conditionPattern)){
+                    if(!Variables.canAssign(condition, parent, "boolean")) {
+                        throw new LogicalException("bad condition syntax ");
+                    }
             }
         }
     }
