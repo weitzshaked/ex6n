@@ -18,8 +18,19 @@ public class Method extends CodeBlock {
     public static final String PARAM_LINE_PATTERN = "(?<params>" + PARAM_PATTERN + "," + PARAM_PATTERN + ")";
     public static final String GENERIC_PARAM_DATA = "0";
 
+
+    /**
+     *
+     * @param parent
+     * @param codeLines
+     * @param name
+     * @param parameters
+     * @param returnStatement
+     * @throws Exception
+     */
     public Method(CodeBlock parent, String[] codeLines, String name, String parameters, String returnStatement) throws Exception {
         super(parent, codeLines);
+        if(!codeLines[codeLines.length-1].equals("return")) throw new SyntaxException("no return "+ currentLine--);
         if (returnStatement.equals("void")) {
             this.name = name;
             if (checkOneLiner(parameters, PARAM_LINE_PATTERN)) {
@@ -38,23 +49,32 @@ public class Method extends CodeBlock {
                         innerVariables.add(VariableFactory.variableFactory(this, type, isFinal, str));
                         innerVariables.get(paramNum).updateData(GENERIC_PARAM_DATA);
                         paramNum++;
-                    } else throw new SyntaxException();
+                    } else throw new SyntaxException("bad params ");
                 }
             } else if (parameters.trim().length() != 0) {
-                throw new SyntaxException();
+                throw new SyntaxException("bad params syntax ");
             }
         }
-        else throw new SyntaxException();
+        else throw new SyntaxException("void missing ");
     }
 
+    /**
+     *
+     * @return method name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * checks method call
+     * @param paramLine
+     * @throws LogicalException
+     */
     public void methodCall(String paramLine) throws LogicalException{
         String[] params = paramLine.split(",");
         if(params.length != paramNum){
-            throw new LogicalException();
+            throw new LogicalException("wrong num of params " + currentLine);
         }
         else{
             for (int i=0; i<paramNum;i++){

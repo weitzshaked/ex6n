@@ -1,5 +1,6 @@
 package oop.ex6.main;
 
+import oop.ex6.Exceptions.LogicalException;
 import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.codeBlocks.CodeBlock;
 import oop.ex6.codeBlocks.GlobalBlock;
@@ -35,14 +36,12 @@ public class Sjavac {
     public static void main(String[] args) {
         try {
             Sjavac sjavac = new Sjavac(args[0]);
+            System.out.println(0);
         } catch (IOException e) {
             System.out.println(2);
             System.out.println(e.getMessage());
-        }catch (SyntaxException e) {
-            //TODO something
         }catch (Exception e) {
-            //TODO something
+            System.out.println(1);
         }
-        System.out.println(0);
     }
 }

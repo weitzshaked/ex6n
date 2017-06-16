@@ -31,7 +31,7 @@ public class ConditionBlock extends CodeBlock {
         for (String condition : conditions) {
             if (!checkOneLiner(condition, conditionPattern) ||
                     !Variables.canAssign(condition, parent, "boolean")) {
-                throw new LogicalException();
+                throw new LogicalException("bad condition syntax ");
             }
         }
     }
