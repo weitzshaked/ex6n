@@ -1,7 +1,5 @@
 package oop.ex6.codeBlocks;
 
-import oop.ex6.Exceptions.SyntaxException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +16,7 @@ public class GlobalBlock extends CodeBlock {
         super(parent,codeLines);
         this.methods = new ArrayList<>();
     }
+
     public static GlobalBlock getInstance(CodeBlock parent, String[] codeLines)throws Exception {
         if(instance == null) {
             instance = new GlobalBlock(parent,codeLines);

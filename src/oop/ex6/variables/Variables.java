@@ -42,9 +42,15 @@ public class Variables {
         this.isFinal = isFinal;
     }
 
+    /**
+     * updates variable data
+     *
+     * @param data
+     * @throws LogicalException
+     */
     public void updateData(String data) throws LogicalException {
         if (isFinal) {
-            throw new LogicalException();
+            throw new LogicalException("can't change final variable ");
         } else {
             for (Types types : Types.values()) {
                 if (types.name.equals(type)) {
@@ -57,7 +63,7 @@ public class Variables {
                         if (canAssign(data, codeBlock, type)) {
                             hasData = true;
                         } else {
-                            throw new LogicalException();
+                            throw new LogicalException("bad variable assignment ");
                         }
                     }
                 }
@@ -66,6 +72,15 @@ public class Variables {
         }
     }
 
+    /**
+     * checks if assignment is legal
+     *
+     * @param data
+     * @param firstCodeBlock
+     * @param typeToMatch
+     * @return
+     * @throws LogicalException
+     */
     public static boolean canAssign(String data, CodeBlock firstCodeBlock, String typeToMatch) throws LogicalException {
         Variables variable = firstCodeBlock.findVariable(data);
         if (variable != null) {
@@ -82,19 +97,30 @@ public class Variables {
                 }
             }
         }
-        throw new LogicalException();
+        throw new LogicalException("illegal assignment ");
     }
 
 
+    /**
+     * checks if variable has data
+     *
+     * @return boolean
+     */
     public boolean hasData() {
         return hasData;
     }
 
 
+    /**
+     * @return variables name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return variables type
+     */
     public String getType() {
         return type;
     }

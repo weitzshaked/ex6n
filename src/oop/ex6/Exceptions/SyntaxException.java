@@ -5,7 +5,7 @@ package oop.ex6.Exceptions;
  */
 public class SyntaxException extends Exception{
 
-//    public SyntaxException(String message){
-//        System.err.println(message);
-//    }
+    public SyntaxException(String message){
+        System.err.println(message);
+    }
 }
