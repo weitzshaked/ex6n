@@ -32,9 +32,9 @@ public abstract class CodeBlock {
             "(\\s*\\D\\w*(\\s*=\\s*.+)?\\s*))(?<ending>;\\s*)";
     public static final String OPEN_BLOCK_PATTERN = ".*?\\{\\s*";
     public static final String CLOSE_BLOCK_PATTERN = "\\s*\\}\\s*";
-    public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D[A-Za-z0-9_]*\\s*)\\((?<params>(\\w+,)*\\s*(\\w+)?)\\)\\s*;";
+    public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D[A-Za-z0-9_]*\\s*)\\(\\s*(?<params>(\\w+,)*\\s*(\\w+)?)\\)\\s*;";
     public static final String VARIABLE_ASSIGNMENT_PATTERN = "(?<name>\\s*\\D[A-Za-z0-9_]*)((\\s*=\\s*(?<value>.+)?\\s*))(?<ending>;\\s*)";
-    public static final String METHOD_PATTERN = "\\s*(?<returnStatement>\\D+\\s+)(?<name>\\D[a-zA-Z0-9_]*\\s*)\\(\\s*(?<params>\\w.*\\s*)*\\)\\s*\\{\\s*";
+    public static final String METHOD_PATTERN = "\\s*(?<returnStatement>\\D+\\s+)(?<name>[A-Za-z][a-zA-Z0-9_]*\\s*)\\(\\s*(?<params>\\w.*\\s*)*\\)\\s*\\{\\s*";
     public static final String CONDITION_PATTERN = "\\s*(?<type>\\D+\\s*)(\\((?<condition>\\w.*?)\\))\\s*\\{\\s*";
 
     //    private static boolean isGlobal = true;
@@ -71,7 +71,8 @@ public abstract class CodeBlock {
                     String[] innerCodeLines = parseBlock();
                     //reset matcher to method pattern
                     checkOneLiner(methodStatement, METHOD_PATTERN);
-                    this.methods.add(new Method(this, innerCodeLines, matcher.group("name"), matcher.group("params"), matcher.group("returnStatement")));
+                    System.out.println(matcher.group("returnStatement").trim());
+                    this.methods.add(new Method(this, innerCodeLines, matcher.group("name").trim(), matcher.group("params"), matcher.group("returnStatement").trim()));
                 } else throw new LogicalException("method declared in wrong block " + currentLine);
                 //line is the beginning of a condition block;
             } else if (checkOneLiner(codeLines[currentLine], CONDITION_PATTERN)) {
@@ -82,7 +83,7 @@ public abstract class CodeBlock {
                 conditions.add(new ConditionBlock(this, codeLines, matcher.group("condition"), matcher.group("type")));
             }//line is an assignment of an existing variable;
             else if (checkOneLiner(codeLines[currentLine], VARIABLE_ASSIGNMENT_PATTERN)) {
-                Variables variable = findVariable(matcher.group("name"));
+                Variables variable = findVariable(matcher.group("name").trim());
                 if (variable != null) {
                     variable.updateData(matcher.group("value"));
                     currentLine++;
