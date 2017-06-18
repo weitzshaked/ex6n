@@ -28,14 +28,14 @@ public abstract class CodeBlock {
     protected Pattern pattern;
 
     public static final String IGNORE_LINE_PATTERN = "^\\//.+|\\s*|\\s*return;";
-    public static final String VARIABLE_PATTERN = "\\s*(?<final>final\\s+)?(?<type>\\w*\\s+)(?<nameAndValues>(\\D\\w*(\\s*=\\s*\\.+)?(\\s*,))*" +
-            "(\\s*\\D\\w*(\\s*=\\s*.+)?\\s*))(?<ending>;\\s*)";
+    public static final String VARIABLE_PATTERN = "\\s*(?<final>final\\s+)?(?<type>[A-Za-z]+\\s+)(?<nameAndValues>([A-Za-z]\\w*(\\s*=\\s*\\.+)?(\\s*,))*" +
+            "(\\s*\\[A-Za-z]\\w*(\\s*=\\s*.+)?\\s*))(?<ending>;\\s*)";
     public static final String OPEN_BLOCK_PATTERN = ".*?\\{\\s*";
     public static final String CLOSE_BLOCK_PATTERN = "\\s*\\}\\s*";
-    public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D[A-Za-z0-9_]*\\s*)\\(\\s*(?<params>(\\w+,)*\\s*(\\w+)?)\\)\\s*;";
-    public static final String VARIABLE_ASSIGNMENT_PATTERN = "(?<name>\\s*\\D[A-Za-z0-9_]*)((\\s*=\\s*(?<value>.+)?\\s*))(?<ending>;\\s*)";
-    public static final String METHOD_PATTERN = "\\s*(?<returnStatement>\\D+\\s+)(?<name>[A-Za-z][a-zA-Z0-9_]*\\s*)\\(\\s*(?<params>\\w.*\\s*)*\\)\\s*\\{\\s*";
-    public static final String CONDITION_PATTERN = "\\s*(?<type>\\D+\\s*)(\\((?<condition>\\w.*?)\\))\\s*\\{\\s*";
+    public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>[A-Za-z][A-Za-z0-9_]*\\s*)\\(\\s*(?<params>(\\w+,)*\\s*(\\w+)?)\\)\\s*;";
+    public static final String VARIABLE_ASSIGNMENT_PATTERN = "(?<name>\\s*[A-Za-z][A-Za-z0-9_]*)((\\s*=\\s*(?<value>.+)?\\s*))(?<ending>;\\s*)";
+    public static final String METHOD_PATTERN = "\\s*(?<returnStatement>[A-Za-z]+\\s+)(?<name>[A-Za-z][a-zA-Z0-9_]*\\s*)\\(\\s*(?<params>\\w.*\\s*)*\\)\\s*\\{\\s*";
+    public static final String CONDITION_PATTERN = "\\s*(?<type>[A-Za-z]+\\s*)\\((?<condition>[A-Za-z].*?)\\)\\s*\\{\\s*";
 
     //    private static boolean isGlobal = true;
     protected static int currentLine = 0;
@@ -71,7 +71,6 @@ public abstract class CodeBlock {
                     String[] innerCodeLines = parseBlock();
                     //reset matcher to method pattern
                     checkOneLiner(methodStatement, METHOD_PATTERN);
-                    System.out.println(matcher.group("returnStatement").trim());
                     this.methods.add(new Method(this, innerCodeLines, matcher.group("name").trim(), matcher.group("params"), matcher.group("returnStatement").trim()));
                 } else throw new LogicalException("method declared in wrong block " + currentLine);
                 //line is the beginning of a condition block;
@@ -80,7 +79,7 @@ public abstract class CodeBlock {
                 String[] codeLines = parseBlock();
                 //reset to condition pattern
                 checkOneLiner(conditionStatement, CONDITION_PATTERN);
-                conditions.add(new ConditionBlock(this, codeLines, matcher.group("condition"), matcher.group("type")));
+                conditions.add(new ConditionBlock(this, codeLines, matcher.group("condition").trim(), matcher.group("type").trim()));
             }//line is an assignment of an existing variable;
             else if (checkOneLiner(codeLines[currentLine], VARIABLE_ASSIGNMENT_PATTERN)) {
                 Variables variable = findVariable(matcher.group("name").trim());

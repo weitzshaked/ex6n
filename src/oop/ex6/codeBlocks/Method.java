@@ -14,7 +14,7 @@ public class Method extends CodeBlock {
 
     private String name;
     private int paramNum = 0;
-    public static final String PARAM_PATTERN = "((?<modifier>final )?\\s*(?<type>[A-Za-z]\\s+)(?<name>[A-Za-z][A-Za-z0-9_]*\\s*))";
+    public static final String PARAM_PATTERN = "((?<modifier>final )?\\s*(?<type>[A-Za-z]+\\s+)(?<name>[A-Za-z][A-Za-z0-9_]*\\s*))";
     public static final String PARAM_LINE_PATTERN = "(?<params>((?<modifier>final )?\\s*(?<type>\\D+)\\s+(?<name>\\D+[A-Za-z0-9_]*),)*((final )?\\s*(\\D+)\\s+(\\D+[A-Za-z0-9_]*)))";
     public static final String GENERIC_PARAM_DATA = "0";
     public static final String RETURN = "\\s*return;";
@@ -47,7 +47,7 @@ public class Method extends CodeBlock {
                             if (matcher.group("modifier") != null) {
                                 isFinal = true;
                             }
-                            String type = matcher.group("type");
+                            String type = matcher.group("type").trim();
                             innerVariables.add(VariableFactory.variableFactory(this, type, isFinal, matcher.group("name")));
                             innerVariables.get(paramNum).setHasData();
                             paramNum++;
