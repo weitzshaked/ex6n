@@ -84,7 +84,7 @@ public class Method extends CodeBlock {
             throw new LogicalException("wrong num of params " + currentLine);
         } else {
             for (int i = 0; i < paramNum; i++) {
-                innerVariables.get(i).updateData(params[i]);
+                innerVariables.get(i).updateData(params[i].trim());
             }
         }
 
