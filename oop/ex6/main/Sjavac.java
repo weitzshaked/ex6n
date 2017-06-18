@@ -40,6 +40,7 @@ public class Sjavac {
     public static void main(String[] args) {
         try {
             Sjavac sjavac = new Sjavac(args[0]);
+            if(!args[0].endsWith(".sjava")) throw new IOException();
             System.out.println(0);
         } catch (IOException e) {
             System.out.println(2);

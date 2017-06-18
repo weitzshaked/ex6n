@@ -45,6 +45,7 @@ public abstract class CodeBlock {
         this.codeLines = codeLines;
         this.innerVariables = new ArrayList<>();
         this.conditions = new ArrayList<>();
+        this.methods = new ArrayList<>();
     }
 
 
@@ -69,7 +70,7 @@ public abstract class CodeBlock {
                     String[] innerCodeLines = parseBlock();
                     //reset matcher to method pattern
                     checkOneLiner(methodStatement, METHOD_PATTERN);
-                    this.methods.add(new Method(this, innerCodeLines, matcher.group("name").trim(), matcher.group("params"), matcher.group("returnStatement").trim()));
+                    methods.add(new Method(this, innerCodeLines, matcher.group("name").trim(), matcher.group("params"), matcher.group("returnStatement").trim()));
                 } else throw new LogicalException("method declared in wrong block " + currentLine);
                 //line is the beginning of a condition block;
             } else if (checkOneLiner(codeLines[currentLine], CONDITION_PATTERN)) {
@@ -82,8 +83,8 @@ public abstract class CodeBlock {
             else if (checkOneLiner(codeLines[currentLine], VARIABLE_ASSIGNMENT_PATTERN)) {
                 Variables variable = findVariable(matcher.group("name").trim());
                 if (variable != null) {
-                    innerVariables.add(new Variables(this, variable.getType(), null, variable.getName(), variable.isFinal()));
-                    variable.updateData(matcher.group("value"));
+                    this.innerVariables.add(new Variables(this, variable.getType(), null, variable.getName(), variable.isFinal()));
+                    innerVariables.get(innerVariables.size()-1).updateData(matcher.group("value"));
                     currentLine++;
                 } else throw new LogicalException("no such variable " + currentLine);
             }
