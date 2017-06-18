@@ -33,7 +33,7 @@ public class Method extends CodeBlock {
         matcher = pattern.matcher(codeLines[codeLines.length - 1]);
         if (!matcher.matches()) throw new SyntaxException("no return " + currentLine--);
         if (returnStatement.trim().equals("void")) {
-            this.name = name;
+            this.name = name.trim();
             if (parameters != null) {
                 if (checkOneLiner(parameters, PARAM_LINE_PATTERN)) {
                     boolean isFinal;

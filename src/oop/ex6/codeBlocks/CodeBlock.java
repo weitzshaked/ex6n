@@ -93,7 +93,7 @@ public abstract class CodeBlock {
                 if (!this.hasParent()) {
                     throw new LogicalException("method called in global scope");
                 } else {
-                    Method method = findMethod(matcher.group("methodName"));
+                    Method method = findMethod(matcher.group("methodName").trim());
                     if (method != null) {
                         method.methodCall(matcher.group("params"));
                     } else throw new LogicalException("no such method " + currentLine + 1);
