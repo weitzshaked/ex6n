@@ -34,7 +34,7 @@ public abstract class CodeBlock {
     public static final String CLOSE_BLOCK_PATTERN = "\\s*\\}\\s*";
     public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>\\D[A-Za-z0-9_]*\\s*)\\((?<params>(\\w+,)*\\s*(\\w+)?)\\)\\s*;";
     public static final String VARIABLE_ASSIGNMENT_PATTERN = "(?<name>\\s*\\D[A-Za-z0-9_]*)((\\s*=\\s*(?<value>.+)?\\s*))(?<ending>;\\s*)";
-    public static final String METHOD_PATTERN = "\\s*(?<returnStatement>\\D+\\s+)(?<name>\\D[a-zA-Z0-9_]*)\\((?<params>\\w.*\\s*)*\\)\\s*\\{\\s*";
+    public static final String METHOD_PATTERN = "\\s*(?<returnStatement>\\D+\\s+)(?<name>\\D[a-zA-Z0-9_]*\\s*)\\(\\s*(?<params>\\w.*\\s*)*\\)\\s*\\{\\s*";
     public static final String CONDITION_PATTERN = "\\s*(?<type>\\D+\\s*)(\\((?<condition>\\w.*?)\\))\\s*\\{\\s*";
 
     //    private static boolean isGlobal = true;
