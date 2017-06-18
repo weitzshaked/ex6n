@@ -14,7 +14,7 @@ public class Method extends CodeBlock {
 
     private String name;
     private int paramNum = 0;
-    public static final String PARAM_PATTERN = "((?<modifier>final )?\\s*(?<type>\\D+)\\s+(?<name>\\D+[A-Za-z0-9_]*))";
+    public static final String PARAM_PATTERN = "((?<modifier>final )?\\s*(?<type>[A-Za-z]+\\s+)(?<name>[A-Za-z][A-Za-z0-9_]*\\s*))";
     public static final String PARAM_LINE_PATTERN = "(?<params>((?<modifier>final )?\\s*(?<type>\\D+)\\s+(?<name>\\D+[A-Za-z0-9_]*),)*((final )?\\s*(\\D+)\\s+(\\D+[A-Za-z0-9_]*)))";
     public static final String GENERIC_PARAM_DATA = "0";
     public static final String RETURN = "\\s*return;";
@@ -33,7 +33,7 @@ public class Method extends CodeBlock {
         matcher = pattern.matcher(codeLines[codeLines.length - 1]);
         if (!matcher.matches()) throw new SyntaxException("no return " + currentLine--);
         if (returnStatement.trim().equals("void")) {
-            this.name = name;
+            this.name = name.trim();
             if (parameters != null) {
                 if (checkOneLiner(parameters, PARAM_LINE_PATTERN)) {
                     boolean isFinal;
@@ -47,7 +47,7 @@ public class Method extends CodeBlock {
                             if (matcher.group("modifier") != null) {
                                 isFinal = true;
                             }
-                            String type = matcher.group("type");
+                            String type = matcher.group("type").trim();
                             innerVariables.add(VariableFactory.variableFactory(this, type, isFinal, matcher.group("name")));
                             innerVariables.get(paramNum).setHasData();
                             paramNum++;
@@ -77,13 +77,17 @@ public class Method extends CodeBlock {
      */
     public void methodCall(String paramLine) throws LogicalException {
         String[] params = paramLine.split(",");
-        if (params.length != paramNum) {
+        if (paramLine.equals("") && paramNum == 0) {
+            currentLine++;
+            return;
+        } else if (paramNum != params.length) {
             throw new LogicalException("wrong num of params " + currentLine);
         } else {
             for (int i = 0; i < paramNum; i++) {
-                innerVariables.get(i).updateData(params[i]);
+                innerVariables.get(i).updateData(params[i].trim());
             }
         }
+
         currentLine++;
     }
 }
