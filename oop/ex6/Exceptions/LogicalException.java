@@ -6,7 +6,7 @@ package oop.ex6.Exceptions;
 public class LogicalException extends Exception {
 
     public LogicalException(String message){
-//        System.err.println(message);
+        System.err.println(message);
     }
 
 }

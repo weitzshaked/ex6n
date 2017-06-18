@@ -71,7 +71,7 @@ public abstract class CodeBlock {
                     String[] innerCodeLines = parseBlock();
                     //reset matcher to method pattern
                     checkOneLiner(methodStatement, METHOD_PATTERN);
-                    this.methods.add(new Method(this, innerCodeLines, matcher.group("name"), matcher.group("params"), matcher.group("returnStatement")));
+                    methods.add(new Method(this, innerCodeLines, matcher.group("name"), matcher.group("params"), matcher.group("returnStatement")));
                 } else throw new LogicalException("method declared in wrong block " + currentLine);
                 //line is the beginning of a condition block;
             } else if (checkOneLiner(codeLines[currentLine], CONDITION_PATTERN)) {
@@ -90,7 +90,7 @@ public abstract class CodeBlock {
             }
             // line is a call to a method
             else if (checkOneLiner(codeLines[currentLine], METHOD_CALL_PATTERN)) {
-                if (!this.hasParent()) {
+                if (this.hasParent()) {
                     throw new LogicalException("method called in global scope");
                 } else {
                     Method method = findMethod(matcher.group("methodName"));
@@ -239,12 +239,12 @@ public abstract class CodeBlock {
      */
     protected Method findMethod(String name) {
         CodeBlock codeBlock = this;
-        while (codeBlock.hasParent()) {
+        while (!codeBlock.hasParent()) {
             codeBlock = codeBlock.getParent();
-            for (Method method : codeBlock.getMethods()) {
-                if (method.getName().equals(name)) {
-                    return method;
-                }
+        }
+        for (Method method : codeBlock.getMethods()) {
+            if (method.getName().equals(name)) {
+                return method;
             }
         }
         return null;
