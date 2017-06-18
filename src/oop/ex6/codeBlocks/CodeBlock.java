@@ -28,8 +28,8 @@ public abstract class CodeBlock {
     protected Pattern pattern;
 
     public static final String IGNORE_LINE_PATTERN = "^\\//.+|\\s*|\\s*return;";
-    public static final String VARIABLE_PATTERN = "\\s*(?<final>final\\s+)?(?<type>[A-Za-z]+\\s+)(?<nameAndValues>[A-Za-z]\\w*(\\s*=\\s*\\.+)?\\s*,)*" +
-            "(\\s*\\[A-Za-z]\\w*(\\s*=\\s*.+)?\\s*)(?<ending>;\\s*)";
+    public static final String VARIABLE_PATTERN = "\\s*(?<final>final\\s+)?(?<type>[A-Za-z]+\\s+)(?<nameAndValues>([A-Za-z]\\w*(\\s*=\\s*\\.+)?\\s*,)*" +
+            "(\\s*[A-Za-z]\\w*(\\s*=\\s*.+)?\\s*))(?<ending>;\\s*)";
     public static final String OPEN_BLOCK_PATTERN = ".*?\\{\\s*";
     public static final String CLOSE_BLOCK_PATTERN = "\\s*\\}\\s*";
     public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>[A-Za-z][A-Za-z0-9_]*\\s*)\\(\\s*(?<params>(\\w+,)*\\s*(\\w+)?)\\)\\s*;";
@@ -214,7 +214,7 @@ public abstract class CodeBlock {
             isFinal = true;
         }
         String type = matcher.group("type").trim();
-        String namesAndValues = matcher.group("nameAndValues").trim();
+        String namesAndValues = matcher.group("nameAndValues");
         String[] nameAndValuesArray = namesAndValues.split(",");
         for (String str : nameAndValuesArray) {
             innerVariables.add(VariableFactory.variableFactory(this, type, isFinal, str));
