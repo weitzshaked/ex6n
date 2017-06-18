@@ -30,7 +30,7 @@ public class ConditionBlock extends CodeBlock {
         this.conditions = conditionsLine.split("(\\|{2})|(&{2})");
         for (String condition : conditions) {
             if (!checkOneLiner(condition, conditionPattern)){
-                    if(!Variables.canAssign(condition, parent, "boolean")) {
+                    if(!Variables.canAssign(condition.trim(), parent, "boolean")) {
                         throw new LogicalException("bad condition syntax ");
                     }
             }
