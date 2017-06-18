@@ -39,6 +39,5 @@ public class VariableFactory {
             default:
                 throw new LogicalException("no such variable type ");
         }
-
     }
 }
