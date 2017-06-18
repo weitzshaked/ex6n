@@ -32,7 +32,7 @@ public abstract class CodeBlock {
             "(\\s*[A-Za-z]\\w*(\\s*=\\s*.+)?\\s*))(?<ending>;\\s*)";
     public static final String OPEN_BLOCK_PATTERN = ".*?\\{\\s*";
     public static final String CLOSE_BLOCK_PATTERN = "\\s*\\}\\s*";
-    public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>[A-Za-z][A-Za-z0-9_]*\\s*)\\(\\s*(?<params>(\\w+,)*\\s*(\\w+)?)\\)\\s*;";
+    public static final String METHOD_CALL_PATTERN = "\\s*(?<methodName>[A-Za-z][A-Za-z0-9_]*\\s*)\\(\\s*(?<params>(.+,)*\\s*(.+)?)\\)\\s*;\\s*";
     public static final String VARIABLE_ASSIGNMENT_PATTERN = "(?<name>\\s*[A-Za-z][A-Za-z0-9_]*\\s+)((=\\s*(?<value>.+)?\\s*))(?<ending>;\\s*)";
     public static final String METHOD_PATTERN = "\\s*(?<returnStatement>[A-Za-z]+\\s+)(?<name>[A-Za-z][a-zA-Z0-9_]*\\s*)\\(\\s*(?<params>\\w.*\\s*)*\\)\\s*\\{\\s*";
     public static final String CONDITION_PATTERN = "\\s*(?<type>[A-Za-z]+\\s*)\\((?<condition>[A-Za-z].*?)\\)\\s*\\{\\s*";
