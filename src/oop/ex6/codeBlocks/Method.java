@@ -53,11 +53,8 @@ public class Method extends CodeBlock {
                             paramNum++;
                         } else throw new SyntaxException("bad params ");
                     }
-                }
+                } else throw new SyntaxException("bad params ");
             }
-//            } else if (parameters.trim().length() != 0) {
-//                throw new SyntaxException("bad params syntax ");
-//            }
         } else throw new SyntaxException("void missing ");
     }
 

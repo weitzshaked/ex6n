@@ -73,6 +73,10 @@ public class Variables {
         }
     }
 
+    public boolean isFinal() {
+        return isFinal;
+    }
+
     /**
      * checks if assignment is legal
      *

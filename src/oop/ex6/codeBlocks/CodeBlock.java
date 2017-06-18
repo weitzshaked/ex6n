@@ -37,7 +37,6 @@ public abstract class CodeBlock {
     public static final String METHOD_PATTERN = "\\s*(?<returnStatement>[A-Za-z]+\\s+)(?<name>[A-Za-z][a-zA-Z0-9_]*\\s*)\\(\\s*(?<params>\\w.*\\s*)*\\)\\s*\\{\\s*";
     public static final String CONDITION_PATTERN = "\\s*(?<type>[A-Za-z]+\\s*)\\((?<condition>.*)\\)\\s*\\{\\s*";
 
-    //    private static boolean isGlobal = true;
     protected static int currentLine = 0;
 
 
@@ -46,7 +45,6 @@ public abstract class CodeBlock {
         this.codeLines = codeLines;
         this.innerVariables = new ArrayList<>();
         this.conditions = new ArrayList<>();
-        this.methods = new ArrayList<>();
     }
 
 
@@ -84,12 +82,10 @@ public abstract class CodeBlock {
             else if (checkOneLiner(codeLines[currentLine], VARIABLE_ASSIGNMENT_PATTERN)) {
                 Variables variable = findVariable(matcher.group("name").trim());
                 if (variable != null) {
+                    innerVariables.add(new Variables(this, variable.getType(), null, variable.getName(), variable.isFinal()));
                     variable.updateData(matcher.group("value"));
                     currentLine++;
-                }
-//                else if(variable != null){
-////                    Variables.canAssign();
-                else throw new LogicalException("no such variable " + currentLine);
+                } else throw new LogicalException("no such variable " + currentLine);
             }
             // line is a call to a method
             else if (checkOneLiner(codeLines[currentLine], METHOD_CALL_PATTERN)) {
