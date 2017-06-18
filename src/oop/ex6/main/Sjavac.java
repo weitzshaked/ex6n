@@ -43,10 +43,10 @@ public class Sjavac {
             System.out.println(0);
         } catch (IOException e) {
             System.out.println(2);
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }catch (Exception e) {
             System.out.println(1);
-//            System.out.println(e);
+            System.err.println(e);
         }
     }
 }
