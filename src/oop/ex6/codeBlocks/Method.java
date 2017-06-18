@@ -77,13 +77,17 @@ public class Method extends CodeBlock {
      */
     public void methodCall(String paramLine) throws LogicalException {
         String[] params = paramLine.split(",");
-        if (params.length != paramNum) {
+        if (paramLine.equals("") && paramNum == 0) {
+            currentLine++;
+            return;
+        } else if (paramNum != params.length) {
             throw new LogicalException("wrong num of params " + currentLine);
         } else {
             for (int i = 0; i < paramNum; i++) {
                 innerVariables.get(i).updateData(params[i]);
             }
         }
+
         currentLine++;
     }
 }
