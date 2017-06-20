@@ -1,6 +1,7 @@
 package oop.ex6.variables;
 
 import oop.ex6.Exceptions.LogicalException;
+import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.codeBlocks.CodeBlock;
 
 import java.util.regex.Matcher;
@@ -32,7 +33,7 @@ public class Variables {
         }
     }
 
-    public Variables(CodeBlock codeBlock, String type, String data, String name, boolean isFinal) throws Exception {
+    public Variables(CodeBlock codeBlock, String type, String data, String name, boolean isFinal) throws LogicalException {
         this.name = name;
         this.type = type;
         this.codeBlock = codeBlock;

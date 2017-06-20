@@ -1,6 +1,7 @@
 package oop.ex6.codeBlocks;
 
 import oop.ex6.Exceptions.LogicalException;
+import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.variables.Variables;
 
 
@@ -24,15 +25,15 @@ public class ConditionBlock extends CodeBlock {
      * @param type           if/ while block
      * @throws Exception
      */
-    public ConditionBlock(CodeBlock parent, String[] codeLines, String conditionsLine, String type) throws Exception {
+    public ConditionBlock(CodeBlock parent, String[] codeLines, String conditionsLine, String type) throws LogicalException, SyntaxException {
         super(parent, codeLines);
         this.type = type;
         this.conditions = conditionsLine.split("(\\|{2})|(&{2})");
         for (String condition : conditions) {
-            if (!checkOneLiner(condition, conditionPattern)){
-                    if(!Variables.canAssign(condition.trim(), parent, "boolean")) {
-                        throw new LogicalException("bad condition syntax ");
-                    }
+            if (!checkOneLiner(condition, conditionPattern)) {
+                if (!Variables.canAssign(condition.trim(), parent, "boolean")) {
+                    throw new LogicalException("bad condition syntax ");
+                }
             }
         }
     }

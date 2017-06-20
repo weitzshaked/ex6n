@@ -3,7 +3,6 @@ package oop.ex6.main;
 import oop.ex6.Exceptions.LogicalException;
 import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.codeBlocks.CodeBlock;
-import oop.ex6.codeBlocks.GlobalBlock;
 
 import java.io.File;
 import java.io.IOException;

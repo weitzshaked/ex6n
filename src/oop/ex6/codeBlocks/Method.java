@@ -27,11 +27,11 @@ public class Method extends CodeBlock {
      * @param returnStatement
      * @throws Exception
      */
-    public Method(CodeBlock parent, String[] codeLines, String name, String parameters, String returnStatement) throws Exception {
+    public Method(CodeBlock parent, String[] codeLines, String name, String parameters, String returnStatement) throws SyntaxException, LogicalException {
         super(parent, codeLines);
         pattern = Pattern.compile(RETURN);
         matcher = pattern.matcher(codeLines[codeLines.length - 1]);
-        if (!matcher.matches()) throw new SyntaxException("no return " + currentLine--);
+        if (!matcher.matches()) throw new SyntaxException("'return' is missing");
         if (returnStatement.trim().equals("void")) {
             this.name = name.trim();
             if (parameters != null) {
@@ -51,11 +51,11 @@ public class Method extends CodeBlock {
                             innerVariables.add(VariableFactory.variableFactory(this, type, isFinal, matcher.group("name")));
                             innerVariables.get(paramNum).setHasData();
                             paramNum++;
-                        } else throw new SyntaxException("bad params ");
+                        } else throw new SyntaxException("parameters line is invalid");
                     }
-                } else throw new SyntaxException("bad params ");
+                } else throw new SyntaxException("parameters line is invalid");
             }
-        } else throw new SyntaxException("void missing ");
+        } else throw new SyntaxException("method declaration is missing the expression 'void'");
     }
 
 

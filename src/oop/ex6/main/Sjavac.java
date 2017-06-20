@@ -3,7 +3,6 @@ package oop.ex6.main;
 import oop.ex6.Exceptions.LogicalException;
 import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.codeBlocks.CodeBlock;
-import oop.ex6.codeBlocks.GlobalBlock;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,15 +22,14 @@ public class Sjavac {
             String[] lines = new String[allLines.size()];
             lines = allLines.toArray(lines);
 //            CodeBlock mainBlock = GlobalBlock.getInstance(null, lines);
-            CodeBlock mainBlock = new GlobalBlock(null,lines);
+            CodeBlock mainBlock = new CodeBlock(null, lines) {
+            };
             mainBlock.linesToBlocks();
         } catch (IOException e) {
             throw new IOException("ERROR: code file invalid or missing");
-        }
-        catch (SyntaxException e) {
+        } catch (SyntaxException e) {
             throw e;
-        }
-        catch (LogicalException e){
+        } catch (LogicalException e) {
             throw e;
         }
     }
@@ -40,12 +38,12 @@ public class Sjavac {
     public static void main(String[] args) {
         try {
             Sjavac sjavac = new Sjavac(args[0]);
-            if(!args[0].endsWith(".sjava")) throw new IOException();
+            if (!args[0].endsWith(".sjava")) throw new IOException();
             System.out.println(0);
         } catch (IOException e) {
             System.out.println(2);
             System.err.println(e.getMessage());
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(1);
             System.err.println(e);
         }

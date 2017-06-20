@@ -1,6 +1,7 @@
 package oop.ex6.variables;
 
 import oop.ex6.Exceptions.LogicalException;
+import oop.ex6.Exceptions.SyntaxException;
 import oop.ex6.codeBlocks.CodeBlock;
 
 import java.util.regex.Matcher;
@@ -11,7 +12,7 @@ import java.util.regex.Pattern;
  */
 public class VariableFactory {
 
-    public static Variables variableFactory(CodeBlock codeBlock, String type, boolean isFinal, String nameAndVal) throws Exception {
+    public static Variables variableFactory(CodeBlock codeBlock, String type, boolean isFinal, String nameAndVal) throws LogicalException {
         Pattern pattern = Pattern.compile("(?<name>\\s*\\D[A-Za-z0-9_]*\\s*)((?<equal>=\\s*)(?<value>.*))?");
         Matcher matcher = pattern.matcher(nameAndVal);
         String val = null;
