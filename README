@@ -33,6 +33,7 @@ We chose to create classes of each one, where the specific blocks extend the cod
 Each block has a parent block (except for the global block) so it could call global variables and variables declared in outer scopes.
 We decided not to create a global block class because although it differs from other blocks by having the option to create methods and cannot call methods
 simply by checking the blocks parent we could handle the line recognized.
+We changed the CodeBlock from an abstract class because there could be a code block on it's own.
 We chose to create a variables class that is not generic. All variables have the same features, we do not need to save the data because we only want to know
 if a variable has been initialized or not.
 We dealt with the differences with an enum class of types that has the regex of each one so we could check that the data matches the type.
