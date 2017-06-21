@@ -14,6 +14,8 @@ import java.util.List;
  */
 public class Sjavac {
 
+    public static final String ERR_IO = "ERROR: code file invalid or missing";
+
     /**
      * creates a CodeBlock from a sjava file
      * @param path to file
@@ -28,7 +30,7 @@ public class Sjavac {
             CodeBlock mainBlock = new CodeBlock(null, lines);
             mainBlock.linesToBlocks();}
         catch (IOException e) {
-            throw new IOException("ERROR: code file invalid or missing");
+            throw new IOException(ERR_IO);
         } catch (SyntaxException e) {
             throw e;
         } catch (LogicalException e) {
@@ -40,7 +42,7 @@ public class Sjavac {
     public static void main(String[] args) {
         try {
             Sjavac sjavac = new Sjavac(args[0]);
-            if (!args[0].endsWith(".sjava")) throw new IOException();
+            if (!args[0].endsWith(".sjava")) throw new IOException(ERR_IO);
             System.out.println(0);
         } catch (IOException e) {
             System.out.println(2);

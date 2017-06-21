@@ -4,7 +4,7 @@ netta.barak
 =============================
 =      File description     =
 =============================
-dodeBlocks package:
+CodeBlocks package:
 CodeBlock - this abstract class represents a general code block and includes the code parsers, constructors
 and data members needed for a code block.
 ConditionBlock - this class represents a condition block and includes the relevant constructor that verifies
@@ -22,3 +22,33 @@ variables package:
 variables - this class,together with the variable factory, includes all the methods that are check whether or not a variable declaration or
 assignment is valid.
 Variable factory - this class creates a variable according to the declaration line.
+
+=============================
+=  Implementation details   =
+=============================
+s-Java error handling - we chose to divide all errors to syntax errors, logical errors and IO errors. We threw all errors and handled them in the main method,
+printed an informative message and printed 1 or 2 as required.
+Design - each s-java file is built from code blocks and variables, while methods and condition blocks are types of code blocks.
+We chose to create classes of each one, where the specific blocks extend the code block class.
+Each block has a parent block (except for the global block) so it could call global variables and variables declared in outer scopes.
+We decided not to create a global block class because although it differs from other blocks by having the option to create methods and cannot call methods
+simply by checking the blocks parent we could handle the line recognized.
+We chose to create a variables class that is not generic. All variables have the same features, we do not need to save the data because we only want to know
+if a variable has been initialized or not.
+We dealt with the differences with an enum class of types that has the regex of each one so we could check that the data matches the type.
+
+=============================
+=    Answers to questions   =
+=============================
+To modify our code to new types of variables you need to update the enum Types in variables class with the new type and it's pattern, and update the switch case in the variable factory.
+The modifications needed to support new types of methods is to add to Method class a parameter that indicates it's return statement (currently void only), and to check each time we see a return line in the methods inner line that it is the same type as it is supposed to be.
+
+For support inheritage of files we would create a new CodeBlock in the Sjavac constructor of the parent file.
+we would update it's content with "linestoblocks" method and when constructing our file to codeBlock we would save a reference to the parent file code block.
+when we want to call a method we would check it's inner methods and the parent's inner methods.
+
+Two main regular expressions we used were to check if current line is a new method or new variables.
+For the method pattern, we divided it to three main groups, the return statement for checking if void was declared, the name of the function and last the parameters the function receives.
+For the variable pattern, we divided it to final, type, name and values. We want to check whether the variables declared are final and what type they are so that we could create them in the factory.
+We want to have the names and values declared in the line,  so we could create each one and add it to our inner variable list.
+
