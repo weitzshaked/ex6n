@@ -27,7 +27,10 @@ public abstract class CodeBlock {
 
     public static final String ERR_METHOD_NOT_IN_GLOBAL_BLOCK = "methods can only be declared within the global block";
     public static final String ERR_VARIABLE_NOT_FOUND = "you can only assign value to an existing variable";
-    public static final String ERR_METHOD_CALL_IN_GLOBAL="methods can not be called in the global scopes";
+    public static final String ERR_METHOD_CALL_IN_GLOBAL = "methods can not be called in the global scopes";
+    public static final String ERR_METHOD_NOT_FOUND = "the method that was called was not found";
+    public static final String ERR_INVALID_LINE = "invalid line";
+
     private List<ConditionBlock> conditions;
     private List<Method> methods;
     List<Variables> innerVariables;
@@ -55,29 +58,29 @@ public abstract class CodeBlock {
     public void linesToBlocks() throws LogicalException, SyntaxException {
         currentLine = 0;
         while (currentLine < codeLines.length) {
-            //if line should be ignored (empty or comment);
+            //if line should be ignored (empty or comment):
             if (checkOneLiner(codeLines[currentLine], IGNORE_LINE_PATTERN)) {
                 currentLine++;
-            } //line is a variable declaration;
+            } //line is a variable declaration:
             else if (checkOneLiner(codeLines[currentLine], VARIABLE_PATTERN)) {
                 parseVariableLine();
-            } //line is the beginning of a method;
+            } //line is the beginning of a method:
             else if (checkOneLiner(codeLines[currentLine], METHOD_PATTERN)) {
                 if (!this.hasParent()) {
                     String methodStatement = codeLines[currentLine];
                     String[] innerCodeLines = parseBlock();
-                    //reset matcher to method pattern
+                    //reset matcher to method pattern:
                     checkOneLiner(methodStatement, METHOD_PATTERN);
                     methods.add(new Method(this, innerCodeLines, matcher.group("name").trim(), matcher.group("params"), matcher.group("returnStatement").trim()));
                 } else throw new LogicalException(ERR_METHOD_NOT_IN_GLOBAL_BLOCK);
-                //line is the beginning of a condition block;
+                //line is the beginning of a condition block:
             } else if (checkOneLiner(codeLines[currentLine], CONDITION_PATTERN)) {
                 String conditionStatement = codeLines[currentLine];
                 String[] codeLines = parseBlock();
-                //reset to condition pattern
                 checkOneLiner(conditionStatement, CONDITION_PATTERN);
                 conditions.add(new ConditionBlock(this, codeLines, matcher.group("condition").trim(), matcher.group("type").trim()));
-            }//line is an assignment of an existing variable;
+            }
+            //line is an assignment of an existing variable;
             else if (checkOneLiner(codeLines[currentLine], VARIABLE_ASSIGNMENT_PATTERN)) {
                 Variables variable = findVariable(matcher.group("name").trim());
                 if (variable != null) {
@@ -86,7 +89,7 @@ public abstract class CodeBlock {
                     currentLine++;
                 } else throw new LogicalException(ERR_VARIABLE_NOT_FOUND);
             }
-            // line is a call to a method
+            // line is a method call:
             else if (checkOneLiner(codeLines[currentLine], METHOD_CALL_PATTERN)) {
                 if (!this.hasParent()) {
                     throw new LogicalException(ERR_METHOD_CALL_IN_GLOBAL);
@@ -94,9 +97,9 @@ public abstract class CodeBlock {
                     Method method = findMethod(matcher.group("methodName").trim());
                     if (method != null) {
                         method.methodCall(matcher.group("params"));
-                    } else throw new LogicalException("the method that was called doesn't exist");
+                    } else throw new LogicalException(ERR_METHOD_NOT_FOUND);
                 }
-            } else throw new SyntaxException("inavlid line");
+            } else throw new SyntaxException(ERR_INVALID_LINE);
         }
         for (Method method : methods) {
             method.linesToBlocks();
@@ -130,7 +133,7 @@ public abstract class CodeBlock {
     /**
      * finds a variable by name from current block up to global block
      *
-     * @param name
+     * @param name the name of the variable to look for.
      * @return the variable if found, null otherwise
      */
     public Variables findVariable(String name) {
@@ -149,10 +152,10 @@ public abstract class CodeBlock {
     }
 
     /**
-     * finds a variable by name in block received
+     * finds a variable by name in a specific block.
      *
-     * @param codeBlock
-     * @param name
+     * @param codeBlock the relevant CodeBlock.
+     * @param name the name of the variable to look for.
      * @return variable if found, null otherwise
      */
     public Variables findInnerVariable(CodeBlock codeBlock, String name) {
@@ -176,7 +179,7 @@ public abstract class CodeBlock {
     }
 
     /**
-     * parses a block from opening to close brackets
+     * parses a block that starts with '{' and ends with '}'.
      *
      * @return String[] of code lines
      * @throws Exception
