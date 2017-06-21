@@ -13,8 +13,9 @@ public class ConditionBlock extends CodeBlock {
     private String[] conditions;
     private String type;
 
-    public static final String conditionPattern = "\\s*(true|false|(\\d+(\\.\\d+)?))\\s*";
-
+    public static final String CONDITION_PATTERN = "\\s*(true|false|(\\d+(\\.\\d+)?))\\s*";
+    public static final String SEPARATOR ="(\\|{2})|(&{2})";
+    public static final String ERR_CONDITION = "bad condition ";
 
     /**
      * creates a new conditionsLine block
@@ -28,11 +29,11 @@ public class ConditionBlock extends CodeBlock {
     public ConditionBlock(CodeBlock parent, String[] codeLines, String conditionsLine, String type) throws LogicalException, SyntaxException {
         super(parent, codeLines);
         this.type = type;
-        this.conditions = conditionsLine.split("(\\|{2})|(&{2})");
+        this.conditions = conditionsLine.split(SEPARATOR);
         for (String condition : conditions) {
-            if (!checkOneLiner(condition, conditionPattern)) {
+            if (!checkOneLiner(condition, CONDITION_PATTERN)) {
                 if (!Variables.canAssign(condition.trim(), parent, "boolean")) {
-                    throw new LogicalException("bad condition syntax ");
+                    throw new LogicalException(ERR_CONDITION);
                 }
             }
         }

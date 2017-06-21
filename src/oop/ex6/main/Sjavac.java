@@ -14,18 +14,20 @@ import java.util.List;
  */
 public class Sjavac {
 
-
+    /**
+     * creates a CodeBlock from a sjava file
+     * @param path to file
+     * @throws Exception
+     */
     private Sjavac(String path) throws Exception {
         try {
             File javaFile = new File(path);
             List<String> allLines = Files.readAllLines(javaFile.toPath());
             String[] lines = new String[allLines.size()];
             lines = allLines.toArray(lines);
-//            CodeBlock mainBlock = GlobalBlock.getInstance(null, lines);
-            CodeBlock mainBlock = new CodeBlock(null, lines) {
-            };
-            mainBlock.linesToBlocks();
-        } catch (IOException e) {
+            CodeBlock mainBlock = new CodeBlock(null, lines);
+            mainBlock.linesToBlocks();}
+        catch (IOException e) {
             throw new IOException("ERROR: code file invalid or missing");
         } catch (SyntaxException e) {
             throw e;

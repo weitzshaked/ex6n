@@ -14,7 +14,8 @@ import java.util.regex.Pattern;
 /**
  * this abstract class represents a general code block
  */
-public abstract class CodeBlock {
+public class CodeBlock {
+
     public static final String IGNORE_LINE_PATTERN = "^\\//.+|\\s*|\\s*return;";
     public static final String VARIABLE_PATTERN = "\\s*(?<final>final\\s+)?(?<type>[A-Za-z]+\\s+)(?<nameAndValues>(_?[A-Za-z0-9_]+(\\s*=\\s*\\.+)?\\s*,)*" +
             "(\\s*_?[A-Za-z0-9]+(\\s*=\\s*.+)?\\s*))(?<ending>;\\s*)";
@@ -41,6 +42,13 @@ public abstract class CodeBlock {
     static int currentLine = 0;
 
 
+    /**
+     * code block constructor
+     * @param parent
+     * @param codeLines
+     * @throws LogicalException
+     * @throws SyntaxException
+     */
     public CodeBlock(CodeBlock parent, String[] codeLines) throws LogicalException, SyntaxException {
         this.parent = parent;
         this.codeLines = codeLines;
